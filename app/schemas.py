@@ -37,3 +37,11 @@ class ImportRead(BaseModel):
     row_count: int | None
     error_message: str | None
     created_at: datetime
+
+
+class FinancialQuestion(BaseModel):
+    question: str = Field(
+        ...,
+        min_length=1,
+        description="Question to ask the AI-FOS Digital CFO.",
+    )

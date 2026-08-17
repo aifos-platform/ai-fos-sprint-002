@@ -2,3 +2,11 @@
 __pycache__/
 *.pyc
 .env
+uploads/
+git_status.txt
+financial_failures.txt
+node_modules/
+ai_fos.db
+test_openai.py
+data/workspaces/
+staged_files.txt

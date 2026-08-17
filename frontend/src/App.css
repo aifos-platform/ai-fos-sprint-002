@@ -1,0 +1,501 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f7fb;
+  color: #1f2937;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: #16213e;
+  color: white;
+  padding: 30px 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.brand-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.brand h1 {
+  font-size: 24px;
+}
+
+.brand p {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-item {
+  background: transparent;
+  border: none;
+  color: #d1d5db;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.nav-item.active {
+  background: #2563eb;
+  color: white;
+}
+
+.main-content {
+  flex: 1;
+  padding: 35px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.eyebrow {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.topbar h2 {
+  margin-top: 6px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.secondary-button {
+  background: white;
+  border: 1px solid #d1d5db;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+
+.hero-card {
+  grid-column: span 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wide-card {
+  grid-column: span 2;
+}
+
+.card-label {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.card h3 {
+  font-size: 28px;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 13px;
+}
+
+.critical {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.score-ring {
+  width: 90px;
+  height: 90px;
+  border: 8px solid #dc2626;
+  border-radius: 50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  font-weight:bold;
+}
+
+.card-note {
+  margin-top: 10px;
+  color: #64748b;
+}
+
+.negative {
+  color: #dc2626;
+}
+
+.card-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.text-button {
+  border:none;
+  background:none;
+  color:#2563eb;
+  cursor:pointer;
+}
+
+.insight-list {
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.insight-item {
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.risk-dot {
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  margin-top:5px;
+}
+
+.high {
+  background:#dc2626;
+}
+
+.medium {
+  background:#f59e0b;
+}
+
+.progress-track {
+  height:10px;
+  background:#e5e7eb;
+  border-radius:10px;
+  margin-top:20px;
+}
+
+.progress-bar {
+  height:100%;
+  border-radius:10px;
+  background:#2563eb;
+}
+
+@media (max-width:1200px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .hero-card,
+  .wide-card {
+    grid-column: span 2;
+  }
+}
+
+
+@media (max-width:768px) {
+  .app-shell {
+    flex-direction:column;
+  }
+
+  .sidebar {
+    width:100%;
+  }
+
+  .dashboard-grid {
+    grid-template-columns:1fr;
+  }
+
+  .hero-card,
+  .wide-card {
+    grid-column:span 1;
+  }
+}
+
+/* =====================================================
+   AI-FOS Upload Inspection
+===================================================== */
+
+.upload-page {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.upload-page h1 {
+  margin-bottom: 15px;
+}
+
+.upload-page p {
+  color: #64748b;
+}
+
+.inspection-result {
+  margin-top: 40px;
+  padding: 30px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.inspection-result h2 {
+  margin-bottom: 20px;
+}
+
+.inspection-result h3 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.headers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.header-card {
+  background: white;
+  border: 1px solid #dbe3ea;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  transition: 0.2s;
+}
+
+.header-card:hover {
+  background: #2563eb;
+  color: white;
+  cursor: default;
+}
+
+/* =====================================================
+   AI-FOS Column Mapping
+===================================================== */
+
+.mapping-table {
+  margin-top: 15px;
+  border: 1px solid #dbe3ea;
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+}
+
+.mapping-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 0.6fr;
+  gap: 15px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.mapping-row:last-child {
+  border-bottom: none;
+}
+
+.mapping-header {
+  background: #f1f5f9;
+  font-weight: 700;
+  color: #334155;
+}
+
+.mapping-success {
+  display: inline-block;
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mapping-warning {
+  display: inline-block;
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .mapping-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .mapping-header {
+    display: none;
+  }
+}
+
+/* =====================================================
+   AI-FOS Wizard Buttons
+===================================================== */
+
+.mapping-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.primary-button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 26px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.primary-button:hover {
+  background: #1d4ed8;
+}
+
+/* ==========================================
+   Organization Selector
+========================================== */
+
+.organization-selector {
+  min-width: 180px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #1f2937;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.organization-selector:hover {
+  border-color: #2563eb;
+}
+
+.organization-selector:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+}
+
+/* ==========================================
+   Stable Dashboard Heading
+========================================== */
+
+.dashboard-heading {
+  min-width: 240px;
+}
+
+.dashboard-heading .card-note {
+  min-height: 22px;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   Analysis Validation
+========================================== */
+
+.validation-warning {
+  margin-top: 14px;
+}
+
+.validation-warning p {
+  color: #b45309;
+  font-weight: 600;
+}
+
+.validation-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.validation-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 600;
+}
