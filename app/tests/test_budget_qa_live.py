@@ -3,81 +3,98 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-
-BASE_URL = "http://127.0.0.1:13010"
+BASE_URL = "http://127.0.0.1:8000"
 ORGANISATION_ID = "acss"
 
 
 TEST_CASES = [
+    # ---------------------------------
+    # Budget variance
+    # ---------------------------------
     {
         "question": "What is our budget variance?",
         "intent": "portfolio_budget_variance",
-        "answer_contains": "-979,907.46",
+        "answer_contains": "592,924.81",
     },
+    # ---------------------------------
+    # Overall budget position
+    # ---------------------------------
     {
         "question": "How much are we over budget?",
-        "intent": "portfolio_budget_variance",
-        "answer_contains": "-979,907.46",
+        "intent": "portfolio_budget_position",
+        "answer_contains": "264,593.66",
     },
     {
         "question": "Are we spending more than we budgeted?",
-        "intent": "portfolio_budget_variance",
-        "answer_contains": "-979,907.46",
+        "intent": "portfolio_budget_position",
+        "answer_contains": "264,593.66",
     },
     {
         "question": "Are we spending less than we budgeted?",
-        "intent": "portfolio_budget_variance",
-        "answer_contains": "-979,907.46",
+        "intent": "portfolio_budget_position",
+        "answer_contains": "264,593.66",
     },
+    # ---------------------------------
+    # Budget remaining
+    # ---------------------------------
     {
         "question": "How much budget do we have left?",
-        "intent": "portfolio_budget_variance",
-        "answer_contains": "-979,907.46",
+        "intent": "portfolio_budget_remaining",
+        "answer_contains": "264,593.66",
     },
     {
         "question": "Do we still have budget remaining?",
-        "intent": "portfolio_budget_variance",
-        "answer_contains": "-979,907.46",
+        "intent": "portfolio_budget_remaining",
+        "answer_contains": "264,593.66",
     },
     {
         "question": "Is there any budget left?",
-        "intent": "portfolio_budget_variance",
-        "answer_contains": "-979,907.46",
+        "intent": "portfolio_budget_remaining",
+        "answer_contains": "264,593.66",
     },
+    # ---------------------------------
+    # Budget utilization
+    # ---------------------------------
     {
         "question": "What is our budget utilization?",
         "intent": "portfolio_budget_utilization",
-        "answer_contains": "120.43%",
+        "answer_contains": "87.45%",
     },
     {
         "question": "How much of our budget have we used?",
         "intent": "portfolio_budget_utilization",
-        "answer_contains": "120.43%",
+        "answer_contains": "87.45%",
     },
     {
         "question": "What percentage of our budget have we spent?",
         "intent": "portfolio_budget_utilization",
-        "answer_contains": "120.43%",
+        "answer_contains": "87.45%",
     },
+    # ---------------------------------
+    # Unbudgeted actual spending
+    # ---------------------------------
     {
         "question": "How much have we spent without a budget?",
         "intent": "unbudgeted_actual",
-        "answer_contains": "542,370.41",
+        "answer_contains": "328,331.15",
     },
     {
         "question": "How much spending do we have without a budget?",
         "intent": "unbudgeted_actual",
-        "answer_contains": "542,370.41",
+        "answer_contains": "328,331.15",
     },
+    # ---------------------------------
+    # Over-budget lines
+    # ---------------------------------
     {
         "question": "How many budget lines are over budget?",
         "intent": "over_budget_count",
-        "answer_contains": "32",
+        "answer_contains": "25",
     },
     {
         "question": "How many budget lines have exceeded their budgets?",
         "intent": "over_budget_count",
-        "answer_contains": "32",
+        "answer_contains": "25",
     },
 ]
 
@@ -85,10 +102,7 @@ TEST_CASES = [
 def ask_ai_fos(question: str) -> dict:
     encoded_question = urllib.parse.quote(question)
 
-    url = (
-        f"{BASE_URL}/ask/{ORGANISATION_ID}"
-        f"?question={encoded_question}"
-    )
+    url = f"{BASE_URL}/ask/{ORGANISATION_ID}" f"?question={encoded_question}"
 
     request = urllib.request.Request(
         url,
@@ -142,48 +156,31 @@ def run_tests() -> None:
             actual_domain = body.get("domain")
             actual_intent = body.get("intent")
             knowledge_used = body.get("knowledge_used")
-            financial_data_used = body.get(
-                "financial_data_used"
-            )
+            financial_data_used = body.get("financial_data_used")
             answer = str(body.get("answer", ""))
 
             if http_status != 200:
-                reasons.append(
-                    f"HTTP status was {http_status}"
-                )
+                reasons.append(f"HTTP status was {http_status}")
 
             if actual_status != "success":
-                reasons.append(
-                    f"status was {actual_status!r}"
-                )
+                reasons.append(f"status was {actual_status!r}")
 
             if actual_domain != "budget":
-                reasons.append(
-                    f"domain was {actual_domain!r}"
-                )
+                reasons.append(f"domain was {actual_domain!r}")
 
             if actual_intent != expected_intent:
                 reasons.append(
-                    "intent was "
-                    f"{actual_intent!r}; expected "
-                    f"{expected_intent!r}"
+                    "intent was " f"{actual_intent!r}; expected " f"{expected_intent!r}"
                 )
 
             if knowledge_used is not True:
-                reasons.append(
-                    "knowledge_used was not true"
-                )
+                reasons.append("knowledge_used was not true")
 
             if financial_data_used is not True:
-                reasons.append(
-                    "financial_data_used was not true"
-                )
+                reasons.append("financial_data_used was not true")
 
             if answer_contains not in answer:
-                reasons.append(
-                    f"answer did not contain "
-                    f"{answer_contains!r}"
-                )
+                reasons.append(f"answer did not contain " f"{answer_contains!r}")
 
             success = len(reasons) == 0
 
@@ -195,58 +192,34 @@ def run_tests() -> None:
                 status = "FAIL"
 
             print()
-            print(
-                f"{index:02d}. [{status}] "
-                f"{question}"
-            )
-            print(
-                f"    Intent: {actual_intent}"
-            )
-            print(
-                f"    Answer: {answer}"
-            )
+            print(f"{index:02d}. [{status}] " f"{question}")
+            print(f"    Intent: {actual_intent}")
+            print(f"    Answer: {answer}")
 
             if reasons:
                 for reason in reasons:
-                    print(
-                        f"    ERROR: {reason}"
-                    )
+                    print(f"    ERROR: {reason}")
 
         except urllib.error.HTTPError as exc:
             failed += 1
 
             print()
-            print(
-                f"{index:02d}. [FAIL] "
-                f"{question}"
-            )
-            print(
-                f"    HTTP ERROR: {exc.code}"
-            )
+            print(f"{index:02d}. [FAIL] " f"{question}")
+            print(f"    HTTP ERROR: {exc.code}")
 
         except urllib.error.URLError as exc:
             failed += 1
 
             print()
-            print(
-                f"{index:02d}. [FAIL] "
-                f"{question}"
-            )
-            print(
-                f"    CONNECTION ERROR: {exc.reason}"
-            )
+            print(f"{index:02d}. [FAIL] " f"{question}")
+            print(f"    CONNECTION ERROR: {exc.reason}")
 
         except Exception as exc:
             failed += 1
 
             print()
-            print(
-                f"{index:02d}. [FAIL] "
-                f"{question}"
-            )
-            print(
-                f"    ERROR: {exc}"
-            )
+            print(f"{index:02d}. [FAIL] " f"{question}")
+            print(f"    ERROR: {exc}")
 
     print()
     print("=" * 78)

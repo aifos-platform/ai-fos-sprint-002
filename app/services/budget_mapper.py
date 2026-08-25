@@ -27,6 +27,13 @@ FIELD_PATTERNS = {
         r"(\s*\(usd\))?$"
     ),
 
+    "remaining_secured_budget": (
+        r"^original\s*\(\s*-\s*\)\s*actual\s*spending$|"
+        r"^original\s*-\s*actual\s*spending$|"
+        r"^remaining\s*secured\s*budget$|"
+        r"^remaining\s*available\s*budget$"
+    ),    
+
     "revised_budget": (
         r"^(total\s*)?"
         r"revised\s*budget"
@@ -121,6 +128,18 @@ FIELD_PATTERNS = {
         r"^budget\s*notes$|"
         r"^notes$|"
         r"^remarks$"
+    ),
+
+    "grant_start_date": (
+        r"^grant\s*start\s*date$|"
+        r"^fund\s*start\s*date$|"
+        r"^start\s*date$"
+    ),
+
+    "grant_end_date": (
+        r"^grant\s*end\s*date$|"
+        r"^fund\s*end\s*date$|"
+        r"^end\s*date$"
     ),
 }
 

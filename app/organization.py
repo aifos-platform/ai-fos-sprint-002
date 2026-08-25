@@ -8,10 +8,14 @@ from app.services.cash_flow import generate_cash_flow_statement
 from datetime import datetime
 from app.services.period_filter import filter_transactions
 from app.services.budget import Budget
+from app.services.needed_budget import NeededBudget
 from app.services.budget_summary import generate_budget_summary
 from app.services.budget_vs_actual import generate_budget_vs_actual
 from app.services.budget_actual_classifier import (
     BudgetActualClassifier,
+)
+from app.services.needed_budget_vs_actual import (
+    generate_needed_budget_vs_actual,
 )
 from app.services.fund_classifier import FundClassifier
 from app.services.budget_dashboard import generate_budget_dashboard
@@ -28,6 +32,9 @@ from app.services.cfo_recommendations import (
     generate_cfo_recommendations,
 )
 from app.services.liquidity import calculate_liquidity
+from app.services.funding_gap import (
+    generate_funding_gap,
+)
 
 
 class Organization:
@@ -59,6 +66,11 @@ class Organization:
         self.budget_summary = None
         self.budget_vs_actual = None
         self.budget_dashboard = None
+
+        self.needed_budget = NeededBudget()
+        self.needed_budget_summary = None
+        self.needed_budget_vs_actual = None
+        self.funding_gap = None
         self.fund_knowledge: dict[str, Any] = {}
         self.grants: dict[str, Grant] = {}
         self.grant_diagnostics = None
@@ -85,7 +97,6 @@ class Organization:
 
         self.chart_of_accounts = accounts
         self.accounts_by_number = accounts_by_number
-
 
     def load_budget(
         self,
@@ -129,51 +140,150 @@ class Organization:
             enriched_line = dict(budget_line)
 
             donor_code = str(
-                enriched_line.get("donor_code")
-                or enriched_line.get("donor")
-                or ""
+                enriched_line.get("donor_code") or enriched_line.get("donor") or ""
             ).strip()
 
             fund_code = str(
-                enriched_line.get("fund_code")
-                or enriched_line.get("fund")
-                or ""
+                enriched_line.get("fund_code") or enriched_line.get("fund") or ""
             ).strip()
 
-            if (
-                not donor_code
-                and derive_funder_from_fund_code
-                and fund_code
-            ):
-                fund_code_parts = fund_code.split(
-                    fund_code_separator
-                )
+            if not donor_code and derive_funder_from_fund_code and fund_code:
+                fund_code_parts = fund_code.split(fund_code_separator)
 
-                if (
-                    0 <= funder_code_segment
-                    < len(fund_code_parts)
-                ):
-                    derived_donor_code = (
-                        fund_code_parts[
-                            funder_code_segment
-                        ].strip()
-                    )
+                if 0 <= funder_code_segment < len(fund_code_parts):
+                    derived_donor_code = fund_code_parts[funder_code_segment].strip()
 
                     if derived_donor_code:
-                        enriched_line[
-                            "donor_code"
-                        ] = derived_donor_code
+                        enriched_line["donor_code"] = derived_donor_code
 
-            enriched_budget_lines.append(
-                enriched_line
-            )
+            enriched_budget_lines.append(enriched_line)
 
-        self.budget.load_budget(
-            enriched_budget_lines
+        self.budget.load_budget(enriched_budget_lines)
+
+        self.budget_summary = generate_budget_summary(enriched_budget_lines)
+
+    def load_needed_budget(
+        self,
+        needed_budget_lines: list[dict[str, Any]],
+    ) -> None:
+        """
+        Store the organization's normalized annual
+        Needed Budget and generate a summary.
+        """
+
+        self.needed_budget.load_budget(
+            needed_budget_lines
         )
 
-        self.budget_summary = generate_budget_summary(
-            enriched_budget_lines
+        fiscal_years = sorted(
+            {
+                line.get("fiscal_year")
+                for line in self.needed_budget.lines
+                if line.get("fiscal_year") is not None
+            }
+        )
+
+        review_count = sum(
+            bool(
+                line.get("requires_review")
+            )
+            for line in self.needed_budget.lines
+        )
+
+        self.needed_budget_summary = {
+            "line_count": len(
+                self.needed_budget.lines
+            ),
+            "total_needed_budget": (
+                self.needed_budget.total_needed_budget()
+            ),
+            "fiscal_years": fiscal_years,
+            "review_count": review_count,
+        }  
+
+    def generate_needed_budget_analysis(
+        self,
+    ) -> None:
+        """
+        Compare the organization's Needed Budget
+        against budget-consuming General Ledger actuals.
+        """
+
+        if not self.needed_budget.lines:
+            raise ValueError(
+                "Load the Needed Budget before generating "
+                "Needed Budget vs Actual."
+            )
+
+        if not self.general_ledger:
+            raise ValueError(
+                "Load the General Ledger before generating "
+                "Needed Budget vs Actual."
+            )
+
+        transactions_for_analysis = getattr(
+            self,
+            "normalized_general_ledger",
+            None,
+        )
+
+        if not transactions_for_analysis:
+            transactions_for_analysis = (
+                self.general_ledger
+            )
+
+        self.needed_budget_vs_actual = (
+            generate_needed_budget_vs_actual(
+                needed_budget_lines=(
+                    self.needed_budget.lines
+                ),
+                available_budget_lines=(
+                    self.budget.lines
+                ),
+                transactions=(
+                    transactions_for_analysis
+                ),
+                accounts_by_number=(
+                    self.accounts_by_number
+                ),
+            )
+        )
+
+
+    def generate_funding_gap_analysis(
+        self,
+    ) -> None:
+        """
+        Calculate the organization's current Funding Gap
+        using Needed Budget, actual spending, remaining
+        secured funding, and validated grant periods.
+        """
+
+        if not self.needed_budget_vs_actual:
+            self.funding_gap = None
+            return
+
+        grant_periods = {
+            grant_code: {
+                "start_date": grant.start_date,
+                "end_date": grant.end_date,
+            }
+            for grant_code, grant in self.grants.items()
+        }
+
+        self.funding_gap = generate_funding_gap(
+            needed_budget_vs_actual=(
+                self.needed_budget_vs_actual
+            ),
+            available_budget_lines=(
+                self.budget.lines
+            ),
+            budget_vs_actual=(
+                self.budget_vs_actual
+            ),
+            grant_periods=(
+                grant_periods
+            ),
         )
 
     def load_fund_knowledge(
@@ -193,9 +303,7 @@ class Organization:
         """
 
         if not self.budget.lines:
-            raise ValueError(
-                "Load the Budget before generating Budget vs Actual."
-            )
+            raise ValueError("Load the Budget before generating Budget vs Actual.")
 
         if not self.general_ledger:
             raise ValueError(
@@ -220,7 +328,7 @@ class Organization:
         self.budget_dashboard = generate_budget_dashboard(
             budget_summary=self.budget_summary,
             budget_vs_actual=self.budget_vs_actual,
-        )    
+        )
 
         self.build_grants()
 
@@ -325,10 +433,63 @@ class Organization:
 
             grant.code = grant_code
 
-            grant_name = str(budget_line.get("fund_name") or "").strip()
+            grant_name = str(
+                budget_line.get(
+                    "fund_name"
+                )
+                or ""
+            ).strip()
 
             if grant_name:
                 grant.name = grant_name
+
+            grant_start_date = str(
+                budget_line.get(
+                    "grant_start_date"
+                )
+                or ""
+            ).strip()
+
+            grant_end_date = str(
+                budget_line.get(
+                    "grant_end_date"
+                )
+                or ""
+            ).strip()
+
+            if grant_start_date:
+                if (
+                    grant.start_date
+                    and grant.start_date
+                    != grant_start_date
+                ):
+                    raise ValueError(
+                        f"Conflicting grant start dates "
+                        f"found for grant {grant_code}: "
+                        f"{grant.start_date} and "
+                        f"{grant_start_date}."
+                    )
+
+                grant.start_date = (
+                    grant_start_date
+                )
+
+            if grant_end_date:
+                if (
+                    grant.end_date
+                    and grant.end_date
+                    != grant_end_date
+                ):
+                    raise ValueError(
+                        f"Conflicting grant end dates "
+                        f"found for grant {grant_code}: "
+                        f"{grant.end_date} and "
+                        f"{grant_end_date}."
+                    )
+
+                grant.end_date = (
+                    grant_end_date
+                )
 
             grant.original_budget += float(budget_line.get("original_budget") or 0)
 
@@ -366,15 +527,59 @@ class Organization:
             if not grant_code:
                 continue
 
-            #
-            # Only attach GL activity to funds that
-            # were already confirmed as real grants
-            # from the Budget classification step.
-            #
             grant = self.grants.get(grant_code)
 
+            #
+            # If this fund was not present in the Budget,
+            # determine whether the GL activity belongs to
+            # a confirmed real grant.
+            #
             if grant is None:
-                continue
+
+                donor_code = str(
+                    transaction.get("donor_code") or transaction.get("donor") or ""
+                ).strip()
+
+                if not donor_code and derive_funder_from_fund_code and grant_code:
+                    fund_code_parts = grant_code.split(fund_code_separator)
+
+                    if 0 <= funder_code_segment < len(fund_code_parts):
+                        donor_code = fund_code_parts[funder_code_segment].strip()
+
+                if donor_code in internal_funder_codes:
+                    is_grant = False
+
+                elif donor_code and default_external_funder_is_grant:
+                    is_grant = True
+
+                else:
+                    fund_classification = fund_classifier.classify(
+                        fund_code=grant_code,
+                        fund_name=transaction.get("fund_name"),
+                        donor_code=transaction.get("donor_code"),
+                        donor_name=transaction.get("donor_name"),
+                        explicit_fund_type=transaction.get("fund_type"),
+                        explicit_is_grant=transaction.get("is_grant"),
+                    )
+
+                    is_grant = fund_classification.get("is_grant") is True
+
+                #
+                # Do not convert unknown or non-grant funds
+                # into Grant objects.
+                #
+                if not is_grant:
+                    continue
+
+                grant = Grant()
+                grant.code = grant_code
+
+                grant_name = str(transaction.get("fund_name") or "").strip()
+
+                if grant_name:
+                    grant.name = grant_name
+
+                self.grants[grant_code] = grant
 
             grant.transactions.append(transaction)
 
@@ -436,6 +641,7 @@ class Organization:
             risk_assessment=self.risk_assessment,
             cfo_recommendations=self.cfo_recommendations,
             budget_dashboard=self.budget_dashboard,
+            funding_gap=self.funding_gap,
             grant_count=len(self.grants),
         )
 
@@ -450,24 +656,39 @@ class Organization:
             )
 
         financial_summary = f"""
-    Financial Analysis:
-    {self.financial_analysis}
+        Financial Analysis:
+        {self.financial_analysis}
 
-    Financial Facts:
-    {self.financial_facts}
+        Financial Facts:
+        {self.financial_facts}
 
-    Income Statement:
-    {self.income_statement}
+        Income Statement:
+        {self.income_statement}
 
-    Balance Sheet:
-    {self.balance_sheet}
+        Balance Sheet:
+        {self.balance_sheet}
 
-    Budget Dashboard:
-    {self.budget_dashboard}
+        Cash Flow:
+        {self.cash_flow}
 
-    Grant Diagnostics:
-    {self.grant_diagnostics}
-    """
+        Financial Health:
+        {self.financial_health}
+
+        Budget Dashboard:
+        {self.budget_dashboard}
+
+        Funding Gap:
+        {self.funding_gap}
+
+        Risk Assessment:
+        {self.risk_assessment}
+
+        CFO Recommendations:
+        {self.cfo_recommendations}
+
+        Grant Diagnostics:
+        {self.grant_diagnostics}
+        """
 
         self.cfo_report = generate_cfo_report(
             financial_summary=financial_summary,
@@ -603,17 +824,38 @@ class Organization:
             self.balance_sheet,
         )
 
-    def calculate_financial_health(self) -> None:
+    def calculate_financial_health(
+        self,
+    ) -> None:
         """
         Calculate the organisation's Financial Health Score.
+
+        Funding Gap intelligence is included so financial
+        health reflects validated secured-funding coverage,
+        not gross funding availability alone.
         """
 
-        self.financial_health = calculate_financial_health(
-            income_statement=self.income_statement,
-            balance_sheet=self.balance_sheet,
-            budget_dashboard=self.budget_dashboard,
-            grant_diagnostics=self.grant_diagnostics,
-            liquidity=self.liquidity,
+        self.financial_health = (
+            calculate_financial_health(
+                income_statement=(
+                    self.income_statement
+                ),
+                balance_sheet=(
+                    self.balance_sheet
+                ),
+                budget_dashboard=(
+                    self.budget_dashboard
+                ),
+                grant_diagnostics=(
+                    self.grant_diagnostics
+                ),
+                liquidity=(
+                    self.liquidity
+                ),
+                funding_gap=(
+                    self.funding_gap
+                ),
+            )
         )
 
     def build_risk_assessment(self) -> None:
@@ -624,9 +866,11 @@ class Organization:
         self.risk_assessment = generate_risk_assessment(
             income_statement=self.income_statement,
             balance_sheet=self.balance_sheet,
+            liquidity=self.liquidity,
             financial_health=self.financial_health,
             budget_dashboard=self.budget_dashboard,
             grant_diagnostics=self.grant_diagnostics,
+            funding_gap=self.funding_gap,
         )
 
     def build_cfo_recommendations(self) -> None:

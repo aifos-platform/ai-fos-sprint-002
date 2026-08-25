@@ -1,0 +1,514 @@
+.ai-cfo-main {
+  min-width: 0;
+}
+
+.ai-cfo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 48px;
+}
+
+
+/* ========================================
+   AI CFO HERO
+   ======================================== */
+
+.ai-cfo-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  padding: 30px 32px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f7f9fc 100%
+    );
+}
+
+.ai-cfo-hero h3 {
+  margin: 8px 0 8px;
+
+  font-size: 28px;
+  line-height: 1.2;
+
+  color: #111827;
+}
+
+.ai-cfo-intro {
+  max-width: 760px;
+
+  margin: 0;
+
+  color: #6b7280;
+
+  line-height: 1.6;
+}
+
+.ai-cfo-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  flex-shrink: 0;
+
+  padding: 9px 13px;
+
+  border: 1px solid #d1fae5;
+  border-radius: 999px;
+
+  background: #ecfdf5;
+
+  color: #047857;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ai-cfo-status-dot {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #10b981;
+}
+
+
+/* ========================================
+   ERRORS
+   ======================================== */
+
+.ai-cfo-error {
+  padding: 14px 16px;
+
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+
+  background: #fef2f2;
+
+  color: #991b1b;
+
+  font-size: 14px;
+}
+
+
+/* ========================================
+   CATEGORY TABS
+   ======================================== */
+
+.ai-cfo-category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+}
+
+.ai-cfo-category-tab {
+  padding: 9px 14px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+
+  background: #ffffff;
+
+  color: #4b5563;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.ai-cfo-category-tab:hover {
+  border-color: #93c5fd;
+
+  background: #f8fbff;
+
+  transform: translateY(-1px);
+}
+
+.ai-cfo-category-tab.active {
+  border-color: #2563eb;
+
+  background: #2563eb;
+
+  color: #ffffff;
+}
+
+
+/* ========================================
+   QUESTION AREA
+   ======================================== */
+
+.ai-cfo-question-section {
+  padding: 26px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+
+  background: #ffffff;
+}
+
+.ai-cfo-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 20px;
+}
+
+.ai-cfo-section-heading h3 {
+  margin: 5px 0 0;
+
+  color: #111827;
+
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.ai-cfo-question-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+.ai-cfo-question-card {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 14px;
+
+  width: 100%;
+
+  padding: 18px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  color: inherit;
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+.ai-cfo-question-card:hover {
+  border-color: #93c5fd;
+
+  background: #f8fbff;
+
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.06);
+
+  transform: translateY(-2px);
+}
+
+.ai-cfo-question-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
+  border-radius: 10px;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.ai-cfo-question-content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  min-width: 0;
+}
+
+.ai-cfo-question-content strong {
+  color: #111827;
+
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.ai-cfo-question-content small {
+  color: #6b7280;
+
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+
+/* ========================================
+   ASK ANYTHING
+   ======================================== */
+
+.ai-cfo-answer-section {
+  padding: 26px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+
+  background: #ffffff;
+}
+
+.ai-cfo-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+.ai-cfo-input {
+  width: 100%;
+  min-height: 110px;
+
+  box-sizing: border-box;
+
+  padding: 16px;
+
+  resize: vertical;
+
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #111827;
+
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ai-cfo-input::placeholder {
+  color: #9ca3af;
+}
+
+.ai-cfo-input:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.ai-cfo-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.ai-cfo-submit {
+  flex-shrink: 0;
+
+  padding: 11px 18px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.ai-cfo-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.ai-cfo-submit:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.5;
+}
+
+
+/* ========================================
+   AI CFO ANSWER
+   ======================================== */
+
+.ai-cfo-answer-card {
+  margin-top: 22px;
+
+  padding: 22px;
+
+  border: 1px solid #dbe3f0;
+  border-radius: 14px;
+
+  background: #f8fafc;
+}
+
+.ai-cfo-answer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 16px;
+}
+
+.ai-cfo-answer-header h3 {
+  margin: 5px 0 0;
+
+  color: #111827;
+
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.ai-cfo-domain-badge {
+  display: inline-flex;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: #eef2ff;
+
+  color: #4338ca;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: capitalize;
+}
+
+.ai-cfo-answer-text {
+  margin: 0;
+
+  color: #374151;
+
+  font-size: 14px;
+  line-height: 1.8;
+
+  white-space: pre-wrap;
+}
+
+.ai-cfo-answer-meta {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-top: 20px;
+  padding-top: 16px;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.ai-cfo-answer-meta span {
+  display: inline-flex;
+
+  padding: 6px 9px;
+
+  border-radius: 999px;
+
+  background: #ffffff;
+
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1000px) {
+
+  .ai-cfo-question-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ai-cfo-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+}
+
+
+@media (max-width: 720px) {
+
+  .ai-cfo-hero,
+  .ai-cfo-question-section,
+  .ai-cfo-answer-section {
+    padding: 18px;
+  }
+
+  .ai-cfo-hero h3 {
+    font-size: 23px;
+  }
+
+  .ai-cfo-form-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ai-cfo-submit {
+    width: 100%;
+  }
+
+  .ai-cfo-answer-header {
+    flex-direction: column;
+  }
+
+}

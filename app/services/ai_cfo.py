@@ -14,6 +14,7 @@ def generate_ai_cfo_report(
     risk_assessment: list[dict[str, Any]] | None,
     cfo_recommendations: list[dict[str, Any]] | None,
     budget_dashboard: dict[str, Any] | None,
+    funding_gap: dict[str, Any] | None,
     grant_count: int,
 ) -> dict[str, Any]:
     """
@@ -29,6 +30,7 @@ def generate_ai_cfo_report(
     risk_assessment = risk_assessment or []
     cfo_recommendations = cfo_recommendations or []
     budget_dashboard = budget_dashboard or {}
+    funding_gap = funding_gap or {}
 
     base_prompt = build_cfo_prompt(
         income_statement=income_statement,
@@ -43,6 +45,7 @@ def generate_ai_cfo_report(
         "financial_health": financial_health,
         "risk_assessment": risk_assessment,
         "cfo_recommendations": cfo_recommendations,
+        "funding_gap": funding_gap,
     }
 
     prompt = (
@@ -57,9 +60,12 @@ def generate_ai_cfo_report(
         instructions=(
             "You are the AI-FOS Digital CFO. "
             "Use only the supplied verified financial data, "
-            "risk assessment, and recommendations. "
+            "risk assessment, recommendations, and funding gap analysis. "
             "Do not invent figures, causes, risks, or explanations. "
             "Clearly distinguish facts from management advice. "
+            "Treat secured funding without Budget-Line allocation as "
+            "restricted or unverified for automatic funding-gap coverage "
+            "unless the supplied data explicitly establishes eligibility. "
             "Prioritize material issues and explain recommendations "
             "in professional CFO language."
         ),
@@ -78,6 +84,7 @@ def generate_ai_cfo_report(
             "risk_count": len(risk_assessment),
             "recommendation_count": len(cfo_recommendations),
             "budget_dashboard_available": bool(budget_dashboard),
+            "funding_gap_available": bool(funding_gap),
             "grant_count": grant_count,
         },
     }

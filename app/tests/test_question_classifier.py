@@ -57,45 +57,53 @@ def run_tests() -> None:
             "budget",
             "portfolio_budget_variance",
         ),
+
+        # ---------------------------------
+        # Overall Budget Position
+        # ---------------------------------
         (
             "How much are we over budget?",
             "budget",
-            "portfolio_budget_variance",
+            "portfolio_budget_position",
         ),
         (
             "How much over budget are we?",
             "budget",
-            "portfolio_budget_variance",
+            "portfolio_budget_position",
         ),
         (
             "How far over budget are we?",
             "budget",
-            "portfolio_budget_variance",
+            "portfolio_budget_position",
         ),
         (
             "Are we spending more than we budgeted?",
             "budget",
-            "portfolio_budget_variance",
+            "portfolio_budget_position",
         ),
         (
             "Are we spending less than we budgeted?",
             "budget",
-            "portfolio_budget_variance",
+            "portfolio_budget_position",
         ),
+
+        # ---------------------------------
+        # Budget Remaining
+        # ---------------------------------
         (
             "How much budget do we have left?",
             "budget",
-            "portfolio_budget_variance",
+            "portfolio_budget_remaining",
         ),
         (
             "Do we still have budget remaining?",
             "budget",
-            "portfolio_budget_variance",
+            "portfolio_budget_remaining",
         ),
         (
             "Is there any budget left?",
             "budget",
-            "portfolio_budget_variance",
+            "portfolio_budget_remaining",
         ),
 
         # ---------------------------------

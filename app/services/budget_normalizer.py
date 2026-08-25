@@ -20,7 +20,9 @@ class BudgetNormalizer:
         budget_line_code: str | None = None,
         budget_line_name: str | None = None,
         original_budget: float | int | str | None = None,
+        remaining_secured_budget: float | int | str | None = None,
         revised_budget: float | int | str | None = None,
+     
 
         # Canonical dimensions
         fund_code: str | None = None,
@@ -36,6 +38,8 @@ class BudgetNormalizer:
         program_name: str | None = None,
         category_name: str | None = None,
         project_name: str | None = None,
+        grant_start_date: Any = None,
+        grant_end_date: Any = None, 
 
         # Currency / period
         original_currency: str | None = None,
@@ -71,6 +75,16 @@ class BudgetNormalizer:
         original_amount = self._to_float(
             original_budget
         )
+
+        remaining_secured_amount = (
+            self._to_float(
+                remaining_secured_budget
+            )
+            if not self._is_blank(
+                remaining_secured_budget
+            )
+            else None
+        )        
 
         revised_amount = (
             self._to_float(revised_budget)
@@ -206,6 +220,11 @@ class BudgetNormalizer:
             "original_budget": (
                 original_amount
             ),
+
+            "remaining_secured_budget": (
+                remaining_secured_amount
+            ),
+
             "revised_budget": (
                 revised_amount
             ),
@@ -225,6 +244,14 @@ class BudgetNormalizer:
             ),
             "exchange_rate": (
                 normalized_exchange_rate
+            ),
+
+            # Grant period
+            "grant_start_date": self._normalize_date(
+                grant_start_date
+            ),
+            "grant_end_date": self._normalize_date(
+                grant_end_date
             ),
 
             # Period
@@ -284,6 +311,39 @@ class BudgetNormalizer:
             return None
 
         return cleaned
+
+    @staticmethod
+    def _normalize_date(
+        value: Any,
+    ) -> str | None:
+        if value is None:
+            return None
+
+        if hasattr(value, "date"):
+            try:
+                return value.date().isoformat()
+            except Exception:
+                pass
+
+        if hasattr(value, "isoformat"):
+            try:
+                return value.isoformat()
+            except Exception:
+                pass
+
+        text = str(value).strip()
+
+        if not text:
+            return None
+
+        if text.lower() in {
+            "none",
+            "null",
+            "nan",
+        }:
+            return None
+
+        return text    
 
     @staticmethod
     def _to_float(

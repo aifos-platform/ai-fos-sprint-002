@@ -55,6 +55,15 @@ from app.services.gl_integrity_validator import GLIntegrityValidator
 from app.services.budget_actual_classifier import (
     BudgetActualClassifier,
 )
+from app.services.question_catalog import (
+    get_question_catalog,
+)
+from app.services.suggested_question_service import (
+    SuggestedQuestionService,
+)
+from app.engines.data_intelligence.question_catalog_validator import (
+    QuestionCatalogValidator,
+)
 
 Base.metadata.create_all(bind=engine)
 
@@ -128,6 +137,7 @@ ai_question_engine = AIQuestionEngine(
     financial_intelligence_service=financial_intelligence_service,
     financial_model_service=financial_model_service,
 )
+suggested_question_service = SuggestedQuestionService()
 
 
 @app.get("/health")
@@ -170,6 +180,106 @@ def ask_ai(
         organisation_id=organisation_id,
     )
 
+@app.get("/ai-cfo/questions")
+def get_ai_cfo_questions() -> dict[str, Any]:
+    """
+    Return the AI-FOS suggested-question catalogue.
+    """
+
+    return {
+        "status": "success",
+        "categories": get_question_catalog(),
+    }
+
+@app.get("/ai-cfo/suggested/{organisation_id}")
+def get_ai_cfo_suggested_questions(
+    organisation_id: str,
+) -> dict[str, Any]:
+    """
+    Return organization-specific AI CFO suggested
+    questions from persisted verified financial
+    intelligence.
+    """
+
+    workspace = (
+        workspace_service
+        .get_workspace_by_organisation(
+            organisation_id=organisation_id
+        )
+    )
+
+@app.get("/ai-cfo/question-catalog/validate")
+def validate_ai_cfo_question_catalog() -> dict[str, Any]:
+    """
+    Validate all predefined AI CFO catalogue questions
+    against the current QuestionClassifier.
+    """
+
+    validator = QuestionCatalogValidator()
+
+    return validator.validate()    
+
+    if workspace is None:
+
+        return {
+            "status": "not_available",
+            "organisation_id": organisation_id,
+            "suggested_questions": [],
+            "message": (
+                "No workspace was found for this "
+                "organization."
+            ),
+        }
+
+    financial_model_folder = Path(
+        workspace[
+            "paths"
+        ][
+            "financial_model"
+        ]
+    )
+
+    intelligence_hub_data = (
+        financial_model_service.load_json(
+            financial_model_folder=(
+                financial_model_folder
+            ),
+            filename="intelligence_hub.json",
+        )
+    )
+
+    if not isinstance(
+        intelligence_hub_data,
+        dict,
+    ):
+
+        return {
+            "status": "not_available",
+            "organisation_id": organisation_id,
+            "suggested_questions": [],
+            "message": (
+                "Verified financial intelligence is "
+                "not available yet."
+            ),
+        }
+
+    suggested_questions = (
+        suggested_question_service
+        .get_suggested_questions(
+            intelligence_hub=(
+                intelligence_hub_data
+            ),
+            limit=8,
+        )
+    )
+
+    return {
+        "status": "success",
+        "organisation_id": organisation_id,
+        "suggested_questions": (
+            suggested_questions
+        ),
+    }
 
 @app.get("/dashboard")
 def get_dashboard():
@@ -634,9 +744,7 @@ async def upload_file(
             Path(workspace["paths"]["ai_knowledge"])
         )
 
-        organization.load_fund_knowledge(
-            fund_knowledge
-        )
+        organization.load_fund_knowledge(fund_knowledge)
 
         organization.load_general_ledger(
             transactions=transactions,
@@ -661,8 +769,42 @@ async def upload_file(
 
                     print("BUDGET restored from workspace.")
 
+            if not organization.needed_budget.lines:
+                saved_needed_budget_file = (
+                    financial_model_folder
+                    / "needed_budget.json"
+                )
+
+                if saved_needed_budget_file.exists():
+
+                    with saved_needed_budget_file.open(
+                        "r",
+                        encoding="utf-8",
+                    ) as needed_budget_json_file:
+                        saved_needed_budget_lines = (
+                            json.load(
+                                needed_budget_json_file
+                            )
+                        )
+
+                    if saved_needed_budget_lines:
+                        organization.load_needed_budget(
+                            saved_needed_budget_lines
+                        )
+
+                        print(
+                            "NEEDED BUDGET restored "
+                            "from workspace."
+                        )                    
+
         if organization.budget.lines:
             organization.generate_budget_analysis()
+
+        if organization.needed_budget.lines:
+            organization.generate_needed_budget_analysis()
+
+        if organization.needed_budget_vs_actual:
+            organization.generate_funding_gap_analysis()                        
 
         organization.process_financials()
 
@@ -677,6 +819,26 @@ async def upload_file(
             financial_analysis=organization.financial_analysis,
         )
 
+        financial_model_service.save_json(
+            financial_model_folder=financial_model_folder,
+            filename="budget_vs_actual.json",
+            data=organization.budget_vs_actual,
+        )
+
+        if organization.needed_budget_vs_actual:
+            financial_model_service.save_json(
+                financial_model_folder=financial_model_folder,
+                filename="needed_budget_vs_actual.json",
+                data=organization.needed_budget_vs_actual,
+            )        
+
+        if organization.funding_gap:
+            financial_model_service.save_json(
+                financial_model_folder=financial_model_folder,
+                filename="funding_gap.json",
+                data=organization.funding_gap,
+            )            
+
         print("STEP 2")
         organization.calculate_financial_health()
         print("STEP 2")
@@ -685,6 +847,34 @@ async def upload_file(
             financial_model_folder=financial_model_folder,
             filename="financial_health.json",
             data=organization.financial_health,
+        )
+
+        grants_data = {
+            grant_code: {
+                "code": grant.code,
+                "name": grant.name,
+                "start_date": grant.start_date,
+                "end_date": grant.end_date,
+                "original_budget": grant.original_budget,
+                "revised_budget": grant.revised_budget,
+                "actual": grant.actual,
+                "remaining_budget": grant.remaining_budget,
+                "utilization": grant.utilization,
+                "projects": sorted(grant.projects),
+            }
+            for grant_code, grant in organization.grants.items()
+        }
+
+        financial_model_service.save_json(
+            financial_model_folder=financial_model_folder,
+            filename="grants.json",
+            data=grants_data,
+        )
+
+        financial_model_service.save_json(
+            financial_model_folder=financial_model_folder,
+            filename="grant_diagnostics.json",
+            data=organization.grant_diagnostics,
         )
         print("STEP 4")
         organization.build_risk_assessment()
@@ -706,6 +896,12 @@ async def upload_file(
         organization.build_kpi_dashboard()
 
         organization.build_executive_dashboard()
+
+        financial_model_service.save_json(
+            financial_model_folder=financial_model_folder,
+            filename="executive_dashboard.json",
+            data=organization.executive_dashboard,
+        )
 
         intelligence_hub_data = intelligence_hub.build(
             organisation_id=organisation_id,
@@ -801,6 +997,8 @@ async def upload_file(
             {
                 "code": grant.code,
                 "name": grant.name,
+                "start_date": grant.start_date,
+                "end_date": grant.end_date,
                 "original_budget": (grant.original_budget),
                 "revised_budget": (grant.revised_budget),
                 "actual": grant.actual,
@@ -894,6 +1092,16 @@ async def upload_file(
 
         organization.load_budget(budget_lines)
 
+        needed_budget_lines = workbook_info.get(
+            "needed_budget_lines",
+            [],
+        )
+
+        if needed_budget_lines:
+            organization.load_needed_budget(
+                needed_budget_lines
+            )        
+
         financial_model_folder = Path(workspace["paths"]["financial_model"])
 
         budget_file = financial_model_service.save_json(
@@ -901,6 +1109,21 @@ async def upload_file(
             filename="budget.json",
             data=budget_lines,
         )
+
+        needed_budget_lines = workbook_info.get(
+            "needed_budget_lines",
+            [],
+        )
+
+        needed_budget_file = None
+
+        if needed_budget_lines:
+            needed_budget_file = financial_model_service.save_json(
+                financial_model_folder=financial_model_folder,
+                filename="needed_budget.json",
+                data=needed_budget_lines,
+            )
+
         return {
             "message": (f"{file.filename} uploaded " f"successfully as a Budget"),
             "workspace_id": workspace["workspace_id"],
@@ -912,6 +1135,10 @@ async def upload_file(
             "size_bytes": file_size,
             "saved_to": saved_to,
             "budget_file": str(budget_file),
+            "needed_budget_file": (
+                str(needed_budget_file) if needed_budget_file else None
+            ),
+            "needed_budget_line_count": len(needed_budget_lines),
             "sheet_count": sheet_count,
             "sheet_names": sheet_names,
             "sheet_name": sheet_name,

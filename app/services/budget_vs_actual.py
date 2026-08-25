@@ -98,9 +98,33 @@ def generate_budget_vs_actual(
 
     classifier = BudgetActualClassifier()
 
+    budget_fund_codes = {
+        str(
+            budget_line.get("fund_code")
+            or budget_line.get("fund")
+            or ""
+        ).strip()
+        for budget_line in budget_lines
+        if str(
+            budget_line.get("fund_code")
+            or budget_line.get("fund")
+            or ""
+        ).strip()
+    }
+
     budget_transactions: list[dict[str, Any]] = []
 
     for transaction in transactions:
+
+        transaction_fund_code = str(
+            transaction.get("fund_code")
+            or transaction.get("fund")
+            or ""
+        ).strip()
+
+        if transaction_fund_code not in budget_fund_codes:
+            continue
+
         classification = classifier.classify(
             transaction=transaction,
             accounts_by_number=accounts_by_number,

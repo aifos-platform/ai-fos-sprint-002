@@ -11,6 +11,14 @@ from app.services.budget_mapper import (
 from app.services.budget_normalizer import (
     BudgetNormalizer,
 )
+from app.services.needed_budget_mapper import (
+    detect_needed_budget_columns,
+    map_needed_budget_columns,
+)
+from app.services.needed_budget_normalizer import (
+    NeededBudgetNormalizer,
+)
+
 from app.services.document_detector import (
     detect_document_type,
 )
@@ -20,12 +28,20 @@ from app.services.gl_mapper import (
 
 
 
+
 def inspect_workbook(
     file_path: str,
 ) -> dict[str, Any]:
     """
-    Inspect the first worksheet and extract data
-    according to the detected AI-FOS document type.
+    Inspect an AI-FOS workbook and extract data
+    according to the detected document type.
+
+    Budget workbooks may contain:
+
+    - Available Budget
+    - Needed Budget
+
+    These datasets are intentionally kept separate.
     """
 
     workbook = load_workbook(
@@ -35,6 +51,10 @@ def inspect_workbook(
 
     sheet_names = workbook.sheetnames
 
+    #
+    # The first worksheet remains the primary sheet
+    # used for normal document-type detection.
+    #
     worksheet = workbook[
         sheet_names[0]
     ]
@@ -72,6 +92,17 @@ def inspect_workbook(
         dict[str, Any]
     ] = []
 
+    needed_budget_mapping: dict[
+        str,
+        str,
+    ] = {}
+
+    needed_budget_lines: list[
+        dict[str, Any]
+    ] = []
+
+    needed_budget_sheet_name: str | None = None
+
     #
     # GENERAL LEDGER
     #
@@ -100,6 +131,10 @@ def inspect_workbook(
 
     elif document_type == "budget":
 
+        #
+        # 1. AVAILABLE / GRANT BUDGET
+        #
+
         budget_mapping = (
             map_budget_columns(
                 headers
@@ -110,7 +145,7 @@ def inspect_workbook(
             detect_budget_period_columns(
                 headers
             )
-        )        
+        )
 
         raw_budget_rows = (
             _extract_budget_rows(
@@ -149,6 +184,11 @@ def inspect_workbook(
                             "original_budget"
                         )
                     ),
+                    remaining_secured_budget=(
+                        row.get(
+                            "remaining_secured_budget"
+                        )
+                    ),
                     revised_budget=(
                         row.get(
                             "revised_budget"
@@ -169,6 +209,18 @@ def inspect_workbook(
                             "fund_name"
                         )
                     ),
+
+                    grant_start_date=(
+                        row.get(
+                            "grant_start_date"
+                        )
+                    ),
+                    grant_end_date=(
+                        row.get(
+                            "grant_end_date"
+                        )
+                    ),
+
                     donor_code=(
                         row.get(
                             "donor_code"
@@ -256,6 +308,196 @@ def inspect_workbook(
                 normalized_line
             )
 
+        #
+        # 2. NEEDED BUDGET
+        #
+        # Find the worksheet by name rather than
+        # assuming that it is always worksheet #2.
+        #
+
+        needed_sheet = None
+
+        for sheet_name in sheet_names:
+
+            if (
+                str(sheet_name)
+                .strip()
+                .lower()
+                == "needed budget"
+            ):
+                needed_sheet = workbook[
+                    sheet_name
+                ]
+
+                needed_budget_sheet_name = (
+                    sheet_name
+                )
+
+                break
+
+        if needed_sheet is not None:
+
+            needed_headers = [
+                (
+                    str(cell.value).strip()
+                    if cell.value is not None
+                    else ""
+                )
+                for cell in needed_sheet[1]
+            ]
+
+            needed_budget_mapping = (
+                map_needed_budget_columns(
+                    needed_headers
+                )
+            )
+
+            needed_amount_columns = (
+                detect_needed_budget_columns(
+                    needed_headers
+                )
+            )
+
+            needed_column_indexes = {
+                field_name: (
+                    needed_headers.index(
+                        header_name
+                    )
+                )
+                for (
+                    field_name,
+                    header_name,
+                ) in (
+                    needed_budget_mapping.items()
+                )
+                if header_name
+                in needed_headers
+            }
+
+            needed_normalizer = (
+                NeededBudgetNormalizer()
+            )
+
+            for row in needed_sheet.iter_rows(
+                min_row=2,
+                values_only=True,
+            ):
+
+                row_data = {
+                    field_name: row[
+                        column_index
+                    ]
+                    for (
+                        field_name,
+                        column_index,
+                    ) in (
+                        needed_column_indexes.items()
+                    )
+                }
+
+                #
+                # One worksheet row can create one
+                # canonical Needed Budget record per
+                # detected fiscal-year amount column.
+                #
+                for amount_column in (
+                    needed_amount_columns
+                ):
+
+                    amount_header = (
+                        amount_column.get(
+                            "header"
+                        )
+                    )
+
+                    if (
+                        amount_header
+                        not in needed_headers
+                    ):
+                        continue
+
+                    amount_index = (
+                        needed_headers.index(
+                            amount_header
+                        )
+                    )
+
+                    needed_amount = row[
+                        amount_index
+                    ]
+
+                    normalized_needed_line = (
+                        needed_normalizer.normalize_line(
+                            program_code=(
+                                row_data.get(
+                                    "program_code"
+                                )
+                            ),
+                            program_name=(
+                                row_data.get(
+                                    "program_name"
+                                )
+                            ),
+                            category_code=(
+                                row_data.get(
+                                    "category_code"
+                                )
+                            ),
+                            category_name=(
+                                row_data.get(
+                                    "category_name"
+                                )
+                            ),
+                            budget_line_code=(
+                                row_data.get(
+                                    "budget_line_code"
+                                )
+                            ),
+                            budget_line_name=(
+                                row_data.get(
+                                    "budget_line_name"
+                                )
+                            ),
+                            budget_notes=(
+                                row_data.get(
+                                    "budget_notes"
+                                )
+                            ),
+                            employee_responsible=(
+                                row_data.get(
+                                    "employee_responsible"
+                                )
+                            ),
+                            fiscal_year=(
+                                amount_column.get(
+                                    "fiscal_year"
+                                )
+                            ),
+                            needed_budget=(
+                                needed_amount
+                            ),
+                        )
+                    )
+
+                    #
+                    # Ignore completely empty lines,
+                    # but preserve explicit zero budgets.
+                    #
+                    if (
+                        not normalized_needed_line.get(
+                            "budget_line_code"
+                        )
+                        and normalized_needed_line.get(
+                            "needed_budget"
+                        )
+                        is None
+                    ):
+                        continue
+
+                    needed_budget_lines.append(
+                        normalized_needed_line
+                    )
+
     return {
         "sheet_count": len(
             sheet_names
@@ -285,6 +527,15 @@ def inspect_workbook(
         ),
         "budget_lines": (
             budget_lines
+        ),
+        "needed_budget_sheet_name": (
+            needed_budget_sheet_name
+        ),
+        "needed_budget_mapping": (
+            needed_budget_mapping
+        ),
+        "needed_budget_lines": (
+            needed_budget_lines
         ),
     }
 

@@ -9,6 +9,8 @@ class Grant:
     def __init__(self):
         self.code: str | None = None
         self.name: str | None = None
+        self.start_date: str | None = None
+        self.end_date: str | None = None
 
         self.original_budget = 0.0
         self.revised_budget = 0.0

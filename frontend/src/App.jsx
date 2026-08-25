@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import Analysis from "./pages/Analysis";
 import Import from "./pages/Import";
+import AICFO from "./pages/AICFO";
 
 
 function App() {
@@ -181,6 +182,16 @@ function App() {
             setSelectedFile={setSelectedFile}
             setUploadStatus={setUploadStatus}
             setInspectionResult={setInspectionResult}
+          />
+        }
+      />
+
+      <Route
+        path="/ai-cfo"
+        element={
+          <AICFO
+            currentOrganization={currentOrganization}
+            setCurrentOrganization={setCurrentOrganization}
           />
         }
       />

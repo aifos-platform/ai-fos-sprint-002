@@ -4,7 +4,7 @@ import urllib.parse
 import urllib.request
 
 
-BASE_URL = "http://127.0.0.1:13010"
+BASE_URL = "http://127.0.0.1:8000"
 ORGANISATION_ID = "acss"
 
 
@@ -41,6 +41,17 @@ TEST_CASES = [
         "domain": "cash",
         "intent": "cash_position",
         "require_financial_data": True,
+    },
+
+    # ---------------------------------
+    # Liquidity Intelligence
+    # ---------------------------------
+    {
+        "question": "What is our cash runway?",
+        "domain": "liquidity",
+        "intent": "cash_runway",
+        "require_financial_data": True,
+        "answer_contains": "11.44",
     },
 
     # ---------------------------------
