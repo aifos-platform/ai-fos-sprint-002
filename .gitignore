@@ -10,3 +10,37 @@ ai_fos.db
 test_openai.py
 data/workspaces/
 staged_files.txt
+
+# AI-FOS temporary development / diagnostic files
+budget_test_output.txt
+capability_numbered.txt
+capability_summary.txt
+cash_flow_generator.txt
+cash_flow_main.txt
+classifier_result.txt
+current_classifier_inventory.txt
+git_status_current.txt
+git_status_full.txt
+income_api_test.txt
+income_excel_api_test.txt
+income_excel_endpoint.txt
+income_excel_generator.txt
+income_excel_tail.txt
+income_persistence_test.txt
+organization_balance_test.txt
+organization_standard_matches.txt
+qa_cases.txt
+runtime_risk_snippet.txt
+service_inventory.txt
+frontend/build-error.txt
+
+# Frontend generated build output
+frontend/dist/
+
+# AI-FOS local runtime state
+data/ai_usage/
+data/organization_registry.json
+
+# Accidental root-level Node files
+/package.json
+/package-lock.json

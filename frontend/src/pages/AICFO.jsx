@@ -3,6 +3,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import ReactMarkdown from "react-markdown";
 
 import { useNavigate } from "react-router-dom";
 
@@ -13,7 +14,9 @@ import "./AICFO.css";
 const navItems = [
   "Dashboard",
   "Financial Health",
+  "Financial History",
   "AI CFO",
+  "Action Center",
   "Budget",
   "Grants",
   "Projects",
@@ -23,7 +26,10 @@ const navItems = [
 
 
 function AICFO({
+  readiness,
+  organizationList,
   currentOrganization,
+  setCurrentOrganization,
 }) {
   const navigate = useNavigate();
 
@@ -47,9 +53,40 @@ function AICFO({
   const organisationName =
     currentOrganization?.name ?? "ACSS";
 
+  const hasFinancialIntelligence =
+    readiness?.has_executive_dashboard === true;
+
+
+  const handleOrganizationChange = (event) => {
+    const selected =
+      organizationList.find(
+        (organization) =>
+          organization.id === event.target.value
+      );
+
+    if (selected) {
+      setCurrentOrganization(selected);
+    }
+  };
+
 
   useEffect(() => {
     let cancelled = false;
+
+    setQuestion("");
+    setAnswer(null);
+    setError("");
+    setSelectedCategory("Suggested");
+
+    if (!hasFinancialIntelligence) {
+      setCatalog([]);
+      setSuggestedQuestions([]);
+      setLoadingQuestions(false);
+
+      return () => {
+        cancelled = true;
+      };
+    }
 
     const loadQuestions = async () => {
       setLoadingQuestions(true);
@@ -102,7 +139,10 @@ function AICFO({
     return () => {
       cancelled = true;
     };
-  }, [organisationId]);
+  }, [
+    organisationId,
+    hasFinancialIntelligence,
+  ]);
 
 
   const categories = useMemo(() => {
@@ -139,6 +179,10 @@ function AICFO({
   const askQuestion = async (
     questionText
   ) => {
+    if (!hasFinancialIntelligence) {
+      return;
+    }
+
     const cleanQuestion =
       questionText?.trim();
 
@@ -186,6 +230,10 @@ function AICFO({
   ) => {
     event.preventDefault();
 
+    if (!hasFinancialIntelligence) {
+      return;
+    }
+
     await askQuestion(
       question
     );
@@ -200,8 +248,44 @@ function AICFO({
       return;
     }
 
+    if (item === "Financial Health") {
+      navigate("/financial-health");
+      return;
+    }
+
     if (item === "AI CFO") {
       navigate("/ai-cfo");
+      return;
+    }
+
+    if (item === "Action Center") {
+      navigate("/action-center");
+      return;
+    }    
+
+    if (item === "Budget") {
+      navigate("/budget");
+      return;
+    }
+
+    if (item === "Grants") {
+      navigate("/grants");
+      return;
+    }
+
+    if (item === "Projects") {
+      navigate("/projects");
+      return;
+    }
+
+    if (item === "Reports") {
+      navigate("/reports");
+      return;
+    }
+
+    if (item === "Settings") {
+      navigate("/settings");
+      return;
     }
   };
 
@@ -225,11 +309,10 @@ function AICFO({
           {navItems.map((item) => (
             <button
               key={item}
-              className={`nav-item ${
-                item === "AI CFO"
-                  ? "active"
-                  : ""
-              }`}
+              className={`nav-item ${item === "AI CFO"
+                ? "active"
+                : ""
+                }`}
               type="button"
               onClick={() =>
                 handleNavigation(item)
@@ -258,6 +341,24 @@ function AICFO({
           </div>
 
           <div className="topbar-actions">
+            <select
+              value={currentOrganization?.id ?? ""}
+              onChange={handleOrganizationChange}
+              className="organization-selector"
+              aria-label="Current organization"
+            >
+              {organizationList.map(
+                (organization) => (
+                  <option
+                    key={organization.id}
+                    value={organization.id}
+                  >
+                    {organization.name}
+                  </option>
+                )
+              )}
+            </select>
+
             <div className="user-avatar">
               ER
             </div>
@@ -265,272 +366,310 @@ function AICFO({
         </header>
 
 
-        <section className="ai-cfo-section">
+        {!hasFinancialIntelligence ? (
 
-          <div className="ai-cfo-hero">
-            <div>
-              <p className="card-label">
-                Digital CFO
-              </p>
+          <section className="ai-cfo-section">
+            <div className="ai-cfo-hero">
+              <div>
+                <p className="card-label">
+                  Organization readiness
+                </p>
 
-              <h3>
-                What would you like to know?
-              </h3>
+                <h3>
+                  AI CFO not available yet
+                </h3>
 
-              <p className="ai-cfo-intro">
-                Ask AI-FOS about financial health,
-                liquidity, funding, budgets, grants,
-                risks, performance, and management
-                priorities.
-              </p>
+                <p className="ai-cfo-intro">
+                  {organisationName} does not yet have
+                  validated financial intelligence
+                  available in AI-FOS. Upload and process
+                  the organization&apos;s financial data
+                  to activate the Digital CFO.
+                </p>
+              </div>
+            </div>
+          </section>
+
+        ) : (
+
+          <section className="ai-cfo-section">
+
+            <div className="ai-cfo-hero">
+              <div>
+                <p className="card-label">
+                  Digital CFO
+                </p>
+
+                <h3>
+                  What would you like to know?
+                </h3>
+
+                <p className="ai-cfo-intro">
+                  Ask AI-FOS about financial health,
+                  liquidity, funding, budgets, grants,
+                  risks, performance, and management
+                  priorities.
+                </p>
+              </div>
+
+              <div className="ai-cfo-status">
+                <span className="ai-cfo-status-dot" />
+
+                Financial intelligence ready
+              </div>
             </div>
 
-            <div className="ai-cfo-status">
-              <span className="ai-cfo-status-dot" />
 
-              Financial intelligence ready
-            </div>
-          </div>
-
-
-          {error && (
-            <div className="ai-cfo-error">
-              {error}
-            </div>
-          )}
+            {error && (
+              <div className="ai-cfo-error">
+                {error}
+              </div>
+            )}
 
 
-          <div className="ai-cfo-category-tabs">
-            {categories.map(
-              (category) => (
-                <button
-                  key={category}
-                  type="button"
-                  className={`ai-cfo-category-tab ${
-                    selectedCategory === category
+            <div className="ai-cfo-category-tabs">
+              {categories.map(
+                (category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    className={`ai-cfo-category-tab ${selectedCategory === category
                       ? "active"
                       : ""
-                  }`}
-                  onClick={() =>
-                    setSelectedCategory(
-                      category
-                    )
-                  }
-                >
-                  {category}
-                </button>
-              )
-            )}
-          </div>
-
-
-          <section className="ai-cfo-question-section">
-
-            <div className="ai-cfo-section-heading">
-              <div>
-                <p className="card-label">
-                  {selectedCategory === "Suggested"
-                    ? "Suggested for you"
-                    : selectedCategory}
-                </p>
-
-                <h3>
-                  {selectedCategory === "Suggested"
-                    ? "Questions based on your financial position"
-                    : "Explore your financial data"}
-                </h3>
-              </div>
+                      }`}
+                    onClick={() =>
+                      setSelectedCategory(
+                        category
+                      )
+                    }
+                  >
+                    {category}
+                  </button>
+                )
+              )}
             </div>
 
 
-            {loadingQuestions ? (
-              <p className="card-note">
-                Loading AI CFO questions...
-              </p>
-            ) : visibleQuestions.length > 0 ? (
-              <div className="ai-cfo-question-grid">
+            <section className="ai-cfo-question-section">
 
-                {visibleQuestions.map(
-                  (item, index) => {
-                    const questionText =
-                      typeof item === "string"
-                        ? item
-                        : item.question;
+              <div className="ai-cfo-section-heading">
+                <div>
+                  <p className="card-label">
+                    {selectedCategory === "Suggested"
+                      ? "Suggested for you"
+                      : selectedCategory}
+                  </p>
 
-                    const itemId =
-                      typeof item === "string"
-                        ? `${selectedCategory}-${index}`
-                        : item.id ??
+                  <h3>
+                    {selectedCategory === "Suggested"
+                      ? "Questions based on your financial position"
+                      : "Explore your financial data"}
+                  </h3>
+                </div>
+              </div>
+
+
+              {loadingQuestions ? (
+                <p className="card-note">
+                  Loading AI CFO questions...
+                </p>
+              ) : visibleQuestions.length > 0 ? (
+                <div className="ai-cfo-question-grid">
+
+                  {visibleQuestions.map(
+                    (item, index) => {
+                      const questionText =
+                        typeof item === "string"
+                          ? item
+                          : item.question;
+
+                      const itemId =
+                        typeof item === "string"
+                          ? `${selectedCategory}-${index}`
+                          : item.id ??
                           `${selectedCategory}-${index}`;
 
-                    return (
-                      <button
-                        key={itemId}
-                        type="button"
-                        className="ai-cfo-question-card"
-                        onClick={() =>
-                          askQuestion(
-                            questionText
-                          )
-                        }
-                      >
-                        <span className="ai-cfo-question-icon">
-                          ?
-                        </span>
+                      return (
+                        <button
+                          key={itemId}
+                          type="button"
+                          className="ai-cfo-question-card"
+                          onClick={() =>
+                            askQuestion(
+                              questionText
+                            )
+                          }
+                        >
+                          <span className="ai-cfo-question-icon">
+                            ?
+                          </span>
 
-                        <span className="ai-cfo-question-content">
-                          <strong>
-                            {questionText}
-                          </strong>
+                          <span className="ai-cfo-question-content">
+                            <strong>
+                              {questionText}
+                            </strong>
 
-                          {item?.reason && (
-                            <small>
-                              {item.reason}
-                            </small>
-                          )}
-                        </span>
-                      </button>
-                    );
-                  }
-                )}
+                            {item?.reason && (
+                              <small>
+                                {item.reason}
+                              </small>
+                            )}
+                          </span>
+                        </button>
+                      );
+                    }
+                  )}
 
-              </div>
-            ) : (
-              <p className="card-note">
-                No questions are available in this category.
-              </p>
-            )}
-
-          </section>
-
-
-          <section className="ai-cfo-answer-section">
-
-            <div className="ai-cfo-section-heading">
-              <div>
-                <p className="card-label">
-                  Ask anything
-                </p>
-
-                <h3>
-                  Ask your Digital CFO
-                </h3>
-              </div>
-            </div>
-
-
-            <form
-              className="ai-cfo-form"
-              onSubmit={handleSubmit}
-            >
-              <textarea
-                className="ai-cfo-input"
-                value={question}
-                onChange={(event) =>
-                  setQuestion(
-                    event.target.value
-                  )
-                }
-                placeholder="Ask a financial question..."
-                rows={3}
-              />
-
-              <div className="ai-cfo-form-footer">
-
+                </div>
+              ) : (
                 <p className="card-note">
-                  Answers use AI-FOS financial
-                  intelligence for {organisationName}.
+                  No questions are available in this category.
                 </p>
+              )}
 
-                <button
-                  className="ai-cfo-submit"
-                  type="submit"
-                  disabled={
-                    asking ||
-                    !question.trim()
+            </section>
+
+
+            <section className="ai-cfo-answer-section">
+
+              <div className="ai-cfo-section-heading">
+                <div>
+                  <p className="card-label">
+                    Ask anything
+                  </p>
+
+                  <h3>
+                    Ask your Digital CFO
+                  </h3>
+                </div>
+              </div>
+
+
+              <form
+                className="ai-cfo-form"
+                onSubmit={handleSubmit}
+              >
+                <textarea
+                  className="ai-cfo-input"
+                  value={question}
+                  onChange={(event) =>
+                    setQuestion(
+                      event.target.value
+                    )
                   }
-                >
-                  {asking
-                    ? "Analyzing..."
-                    : "Ask AI CFO"}
-                </button>
+                  placeholder="Ask a financial question..."
+                  rows={3}
+                />
 
-              </div>
-            </form>
+                <div className="ai-cfo-form-footer">
+
+                  <p className="card-note">
+                    Answers use AI-FOS financial
+                    intelligence for {organisationName}.
+                  </p>
+
+                  <button
+                    className="ai-cfo-submit"
+                    type="submit"
+                    disabled={
+                      asking ||
+                      !question.trim()
+                    }
+                  >
+                    {asking
+                      ? "Analyzing..."
+                      : "Ask AI CFO"}
+                  </button>
+
+                </div>
+              </form>
 
 
-            {asking && (
-              <div className="ai-cfo-answer-card">
-                <p className="card-label">
-                  AI CFO
-                </p>
+              {asking && (
+                <div className="ai-cfo-answer-card">
+                  <p className="card-label">
+                    AI CFO
+                  </p>
 
-                <p>
-                  Analyzing the financial data...
-                </p>
-              </div>
-            )}
+                  <p>
+                    Analyzing the financial data...
+                  </p>
+                </div>
+              )}
 
 
-            {!asking && answer && (
-              <div className="ai-cfo-answer-card">
+              {!asking && answer && (
+                <div className="ai-cfo-answer-card">
 
-                <div className="ai-cfo-answer-header">
-                  <div>
-                    <p className="card-label">
-                      AI CFO response
-                    </p>
+                  <div className="ai-cfo-answer-header">
+                    <div>
+                      <p className="card-label">
+                        AI CFO response
+                      </p>
 
-                    <h3>
-                      {answer.question ??
-                        question}
-                    </h3>
+                      <h3>
+                        {answer.question ??
+                          question}
+                      </h3>
+                    </div>
+
+                    <span className="ai-cfo-domain-badge">
+                      {answer.answer_source ===
+                        "openai_verified_cfo_context"
+                        ? "AI CFO Analysis · Verified AI-FOS Data"
+                        : answer.answer_source ===
+                          "openai_general_cfo"
+                          ? "General CFO Guidance"
+                          : answer.answer_source ===
+                            "scope_guard"
+                            ? "Out of Scope"
+                            : answer.answer_source ===
+                              "ai_usage_control"
+                              ? "AI Usage Limit"
+                              : "Verified AI-FOS Answer"}
+                    </span>
                   </div>
 
-                  {answer.domain && (
-                    <span className="ai-cfo-domain-badge">
-                      {answer.domain}
-                    </span>
-                  )}
-                </div>
+
+                  <div className="ai-cfo-answer-text">
+                    <ReactMarkdown>
+                      {answer.answer ?? "No answer was returned."}
+                    </ReactMarkdown>
+                  </div>
 
 
-                <p className="ai-cfo-answer-text">
-                  {answer.answer ??
-                    "No answer was returned."}
-                </p>
+                  <div className="ai-cfo-answer-meta">
 
+                    {answer.intent && (
+                      <span>
+                        Intent: {answer.intent}
+                      </span>
+                    )}
 
-                <div className="ai-cfo-answer-meta">
+                    {answer.knowledge_used ===
+                      true && (
+                        <span>
+                          Organization knowledge used
+                        </span>
+                      )}
 
-                  {answer.intent && (
-                    <span>
-                      Intent: {answer.intent}
-                    </span>
-                  )}
+                    {answer.financial_data_used ===
+                      true && (
+                        <span>
+                          Financial data used
+                        </span>
+                      )}
 
-                  {answer.knowledge_used ===
-                    true && (
-                    <span>
-                      Organization knowledge used
-                    </span>
-                  )}
-
-                  {answer.financial_data_used ===
-                    true && (
-                    <span>
-                      Financial data used
-                    </span>
-                  )}
+                  </div>
 
                 </div>
+              )}
 
-              </div>
-            )}
+            </section>
 
           </section>
 
-        </section>
+        )}
 
       </main>
 

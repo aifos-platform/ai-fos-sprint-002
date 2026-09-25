@@ -4,7 +4,7 @@ from app.services.chart_of_accounts import ChartOfAccounts
 def test_chart_of_accounts_import():
     chart = ChartOfAccounts()
 
-    chart.load_chart("uploads/chart_of_accounts.xlsx")
+    chart.load_chart("uploads/Chart of Accounts (31).xlsx")
 
     detected_columns = chart.detect_columns()
     validation = chart.validate_chart()

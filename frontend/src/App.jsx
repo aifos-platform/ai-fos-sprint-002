@@ -1,159 +1,454 @@
-import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Route,
+  Routes,
+} from "react-router-dom";
 
 import api from "./api";
 import "./App.css";
+
+import {
+  defaultOrganization,
+  setOrganizationsFromRegistry,
+} from "./organizationRegistry";
 
 import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import Analysis from "./pages/Analysis";
 import Import from "./pages/Import";
 import AICFO from "./pages/AICFO";
+import ActionCenter from "./pages/ActionCenter";
+import FinancialIntelligenceHistory from "./pages/FinancialIntelligenceHistory";
+import Reports from "./pages/Reports";
+import FinancialHealth from "./pages/FinancialHealth";
+import Budget from "./pages/Budget";
+import Grants from "./pages/Grants";
+import Projects from "./pages/Projects";
+import Settings from "./pages/Settings";
+
+
+const INSPECTION_STORAGE_KEY =
+  "ai-fos-current-inspection-result";
+
+
+function loadStoredInspectionResult() {
+  try {
+    const storedResult =
+      sessionStorage.getItem(
+        INSPECTION_STORAGE_KEY
+      );
+
+    if (!storedResult) {
+      return null;
+    }
+
+    return JSON.parse(
+      storedResult
+    );
+  } catch (storageError) {
+    console.error(
+      "Inspection result restore error:",
+      storageError
+    );
+
+    return null;
+  }
+}
 
 
 function App() {
-  const [dashboard, setDashboard] = useState(null);
-  const [error, setError] = useState("");
+  const [
+    dashboard,
+    setDashboard,
+  ] = useState(null);
 
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadStatus, setUploadStatus] = useState("");
-  const [inspectionResult, setInspectionResult] = useState(null);
+  const [
+    readiness,
+    setReadiness,
+  ] = useState(null);
 
-  const [currentOrganization, setCurrentOrganization] = useState({
-    id: "acss",
-    name: "ACSS",
-  });
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    selectedFile,
+    setSelectedFile,
+  ] = useState(null);
+
+  const [
+    uploadStatus,
+    setUploadStatus,
+  ] = useState("");
+
+  const [
+    inspectionResult,
+    setInspectionResult,
+  ] = useState(
+    loadStoredInspectionResult
+  );
+
+  const [
+    organizationList,
+    setOrganizationList,
+  ] = useState([]);
+
+  const [
+    currentOrganization,
+    setCurrentOrganization,
+  ] = useState(
+    defaultOrganization
+  );
 
 
   useEffect(() => {
-    api
-      .get("/dashboard")
-      .then((response) => {
-        setDashboard(response.data);
-      })
-      .catch((requestError) => {
-        console.error(
-          "Dashboard load error:",
-          requestError
+    try {
+      if (inspectionResult) {
+        sessionStorage.setItem(
+          INSPECTION_STORAGE_KEY,
+          JSON.stringify(
+            inspectionResult
+          )
+        );
+      } else {
+        sessionStorage.removeItem(
+          INSPECTION_STORAGE_KEY
+        );
+      }
+    } catch (storageError) {
+      console.error(
+        "Inspection result storage error:",
+        storageError
+      );
+    }
+  }, [inspectionResult]);
+
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadOrganizationRegistry() {
+      try {
+        const response =
+          await api.get(
+            "/organisations/registry"
+          );
+
+        if (cancelled) {
+          return;
+        }
+
+        const registryOrganizations =
+          response.data?.organizations ?? [];
+
+        const registry =
+          setOrganizationsFromRegistry(
+            registryOrganizations
+          );
+
+        setOrganizationList(
+          Object.values(registry)
         );
 
-        setError(
-          "Could not load dashboard data."
+        setCurrentOrganization(
+          (current) =>
+            registry[current?.id] ??
+            registry.acss ??
+            Object.values(registry)[0] ??
+            current
         );
-      });
+      } catch (registryError) {
+        console.error(
+          "Organization registry load error:",
+          registryError
+        );
+      }
+    }
+
+    loadOrganizationRegistry();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      setUploadStatus(
-        "Please select a file first."
+  async function refreshOrganizationRegistry(
+    selectOrganizationId = null
+  ) {
+    const response =
+      await api.get(
+        "/organisations/registry"
       );
 
-      return;
-    }
+    const registryOrganizations =
+      response.data?.organizations ?? [];
 
-    setUploadStatus(
-      "Uploading and inspecting file..."
-    );
-
-    setInspectionResult(null);
-
-    const formData = new FormData();
-
-    formData.append(
-      "file",
-      selectedFile
-    );
-
-    formData.append(
-      "organisation_id",
-      currentOrganization.id
-    );
-
-    formData.append(
-      "organisation_name",
-      currentOrganization.name
-    );
-
-    formData.append(
-      "base_currency",
-      "USD"
-    );
-
-
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
+    const registry =
+      setOrganizationsFromRegistry(
+        registryOrganizations
       );
 
-      if (!response.ok) {
-        const errorText = await response.text();
+    const refreshedOrganizationList =
+      Object.values(registry);
 
-        throw new Error(
-          `Upload failed (${response.status}): ${errorText}`
+    setOrganizationList(
+      refreshedOrganizationList
+    );
+
+    if (selectOrganizationId) {
+      const selectedOrganization =
+        registry[selectOrganizationId];
+
+      if (selectedOrganization) {
+        setCurrentOrganization(
+          selectedOrganization
         );
       }
-
-      const result = await response.json();
-
-      console.log(
-        "Workbook inspection result:",
-        result
-      );
-
-      setInspectionResult(result);
-
-      setUploadStatus(
-        `File inspected successfully. Found ${result.sheet_count} sheet(s).`
-      );
-
-    } catch (uploadError) {
-      console.error(
-        "Upload error:",
-        uploadError
-      );
-
-      setUploadStatus(
-        `Upload failed: ${uploadError.message}`
-      );
-
-      return;
     }
 
+    return registry;
+  }
 
-    try {
-      const dashboardResponse = await api.get(
-        "/dashboard"
-      );
 
-      setDashboard(
-        dashboardResponse.data
-      );
+  useEffect(() => {
+    let cancelled = false;
 
-      setError("");
+    async function loadOrganizationData() {
+      try {
+        setError("");
+        setReadiness(null);
+        setDashboard(null);
 
-    } catch (dashboardError) {
-      console.error(
-        "Dashboard refresh error:",
-        dashboardError
-      );
+        const readinessResponse =
+          await api.get(
+            `/organisations/${currentOrganization.id}/readiness`
+          );
+
+        if (cancelled) {
+          return;
+        }
+
+        const readinessData =
+          readinessResponse.data ?? null;
+
+        setReadiness(
+          readinessData
+        );
+
+        if (
+          !readinessData
+            ?.has_executive_dashboard
+        ) {
+          return;
+        }
+
+        const dashboardResponse =
+          await api.get(
+            "/dashboard",
+            {
+              params: {
+                organisation_id:
+                  currentOrganization.id,
+              },
+            }
+          );
+
+        if (!cancelled) {
+          setDashboard(
+            dashboardResponse.data
+          );
+        }
+      } catch (requestError) {
+        console.error(
+          "Organization data load error:",
+          requestError
+        );
+
+        if (!cancelled) {
+          setDashboard(null);
+
+          setError(
+            "Could not load organization data."
+          );
+        }
+      }
     }
-  };
+
+    loadOrganizationData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentOrganization.id]);
 
 
-  const health = dashboard?.financial_health;
-  const kpis = dashboard?.kpis;
-  const alerts = dashboard?.alerts ?? [];
+  const handleUpload =
+    async () => {
+      if (!selectedFile) {
+        setUploadStatus(
+          "Please select a file first."
+        );
+
+        return;
+      }
+
+      setUploadStatus(
+        "Uploading and inspecting file..."
+      );
+
+      setInspectionResult(null);
+
+      const formData =
+        new FormData();
+
+      formData.append(
+        "file",
+        selectedFile
+      );
+
+      formData.append(
+        "organisation_id",
+        currentOrganization.id
+      );
+
+      formData.append(
+        "organisation_name",
+        currentOrganization.name
+      );
+
+      formData.append(
+        "base_currency",
+        currentOrganization.baseCurrency
+      );
+
+      try {
+        const response =
+          await fetch(
+            "http://127.0.0.1:8000/upload",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+        if (!response.ok) {
+          const errorText =
+            await response.text();
+
+          throw new Error(
+            `Upload failed (${response.status}): ${errorText}`
+          );
+        }
+
+        const result =
+          await response.json();
+
+        console.log(
+          "Workbook inspection result:",
+          result
+        );
+
+        setInspectionResult(
+          result
+        );
+
+        setUploadStatus(
+          `File inspected successfully. Found ${result.sheet_count} sheet(s).`
+        );
+      } catch (uploadError) {
+        console.error(
+          "Upload error:",
+          uploadError
+        );
+
+        setUploadStatus(
+          `Upload failed: ${uploadError.message}`
+        );
+
+        return;
+      }
+
+      try {
+        const readinessResponse =
+          await api.get(
+            `/organisations/${currentOrganization.id}/readiness`
+          );
+
+        const readinessData =
+          readinessResponse.data ?? null;
+
+        setReadiness(
+          readinessData
+        );
+
+        if (
+          readinessData
+            ?.has_executive_dashboard
+        ) {
+          const dashboardResponse =
+            await api.get(
+              "/dashboard",
+              {
+                params: {
+                  organisation_id:
+                    currentOrganization.id,
+                },
+              }
+            );
+
+          setDashboard(
+            dashboardResponse.data
+          );
+        } else {
+          setDashboard(null);
+        }
+
+        setError("");
+      } catch (refreshError) {
+        console.error(
+          "Organization refresh error:",
+          refreshError
+        );
+      }
+    };
+
+
+  const health =
+    dashboard?.financial_health;
+
+  const budget =
+    dashboard?.budget;
+
+  const projectIntelligence =
+    dashboard?.budget?.by_program;
+
+  const fundingGap =
+    dashboard?.funding_gap;
+
+  const fundingGapInsights =
+    dashboard?.funding_gap_insights;
+
+  const grantDiagnostics =
+    dashboard?.grant_diagnostics;
+
+  const coreCostCoverage =
+    dashboard?.core_cost_coverage;  
+
+  const kpis =
+    dashboard?.kpis;
+
+  const alerts =
+    dashboard?.alerts ?? [];
 
 
   return (
     <Routes>
-
       <Route
         path="/"
         element={
@@ -161,11 +456,26 @@ function App() {
             health={health}
             kpis={kpis}
             alerts={alerts}
-            currentOrganization={currentOrganization}
-            setCurrentOrganization={setCurrentOrganization}
-            setSelectedFile={setSelectedFile}
-            setUploadStatus={setUploadStatus}
-            setInspectionResult={setInspectionResult}
+            error={error}
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+            setSelectedFile={
+              setSelectedFile
+            }
+            setUploadStatus={
+              setUploadStatus
+            }
+            setInspectionResult={
+              setInspectionResult
+            }
           />
         }
       />
@@ -177,11 +487,130 @@ function App() {
             health={health}
             kpis={kpis}
             alerts={alerts}
-            currentOrganization={currentOrganization}
-            setCurrentOrganization={setCurrentOrganization}
-            setSelectedFile={setSelectedFile}
-            setUploadStatus={setUploadStatus}
-            setInspectionResult={setInspectionResult}
+            error={error}
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+            setSelectedFile={
+              setSelectedFile
+            }
+            setUploadStatus={
+              setUploadStatus
+            }
+            setInspectionResult={
+              setInspectionResult
+            }
+          />
+        }
+      />
+
+      <Route
+        path="/financial-health"
+        element={
+          <FinancialHealth
+            health={health}
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+          />
+        }
+      />
+
+      <Route
+        path="/financial-history"
+        element={
+          <FinancialIntelligenceHistory
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+          />
+        }
+      />
+
+      <Route
+        path="/budget"
+        element={
+          <Budget
+            budget={budget}
+            coreCostCoverage={coreCostCoverage}
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+          />
+        }
+      />
+
+      <Route
+        path="/grants"
+        element={
+          <Grants
+            fundingGap={
+              fundingGap
+            }
+            fundingGapInsights={
+              fundingGapInsights
+            }
+            grantDiagnostics={
+              grantDiagnostics
+            }
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+          />
+        }
+      />
+
+      <Route
+        path="/projects"
+        element={
+          <Projects
+            projectIntelligence={
+              projectIntelligence
+            }
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
           />
         }
       />
@@ -190,8 +619,72 @@ function App() {
         path="/ai-cfo"
         element={
           <AICFO
-            currentOrganization={currentOrganization}
-            setCurrentOrganization={setCurrentOrganization}
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+          />
+        }
+      />
+
+      <Route
+        path="/action-center"
+        element={
+          <ActionCenter
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+          />
+        }
+      />      
+
+      <Route
+        path="/reports"
+        element={
+          <Reports
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+          />
+        }
+      />
+
+      <Route
+        path="/settings"
+        element={
+          <Settings
+            readiness={readiness}
+            organizationList={
+              organizationList
+            }
+            currentOrganization={
+              currentOrganization
+            }
+            setCurrentOrganization={
+              setCurrentOrganization
+            }
+            refreshOrganizationRegistry={
+              refreshOrganizationRegistry
+            }
           />
         }
       />
@@ -200,13 +693,27 @@ function App() {
         path="/upload"
         element={
           <Upload
-            selectedFile={selectedFile}
-            setSelectedFile={setSelectedFile}
-            uploadStatus={uploadStatus}
-            setUploadStatus={setUploadStatus}
-            handleUpload={handleUpload}
-            inspectionResult={inspectionResult}
-            setInspectionResult={setInspectionResult}
+            selectedFile={
+              selectedFile
+            }
+            setSelectedFile={
+              setSelectedFile
+            }
+            uploadStatus={
+              uploadStatus
+            }
+            setUploadStatus={
+              setUploadStatus
+            }
+            handleUpload={
+              handleUpload
+            }
+            inspectionResult={
+              inspectionResult
+            }
+            setInspectionResult={
+              setInspectionResult
+            }
           />
         }
       />
@@ -215,7 +722,9 @@ function App() {
         path="/analysis"
         element={
           <Analysis
-            inspectionResult={inspectionResult}
+            inspectionResult={
+              inspectionResult
+            }
           />
         }
       />
@@ -224,11 +733,12 @@ function App() {
         path="/import"
         element={
           <Import
-            inspectionResult={inspectionResult}
+            inspectionResult={
+              inspectionResult
+            }
           />
         }
       />
-
     </Routes>
   );
 }

@@ -82,6 +82,7 @@ function Upload({
                             </div>
                         ))}
                     </div>
+
                     <h3>AI-FOS Column Mapping</h3>
 
                     <div className="mapping-table">
@@ -94,17 +95,34 @@ function Upload({
                         {Object.entries(
                             inspectionResult.detected_columns ?? {}
                         ).map(([aiFosField, excelColumn]) => (
-                            <div className="mapping-row" key={aiFosField}>
+                            <div
+                                className="mapping-row"
+                                key={aiFosField}
+                            >
                                 <span>
                                     {aiFosField
                                         .replaceAll("_", " ")
-                                        .replace(/\b\w/g, (letter) => letter.toUpperCase())}
+                                        .replace(
+                                            /\b\w/g,
+                                            (letter) =>
+                                                letter.toUpperCase()
+                                        )}
                                 </span>
 
-                                <span>{excelColumn ?? "Not detected"}</span>
+                                <span>
+                                    {excelColumn ?? "Not detected"}
+                                </span>
 
-                                <span className={excelColumn ? "mapping-success" : "mapping-warning"}>
-                                    {excelColumn ? "Detected" : "Missing"}
+                                <span
+                                    className={
+                                        excelColumn
+                                            ? "mapping-success"
+                                            : "mapping-warning"
+                                    }
+                                >
+                                    {excelColumn
+                                        ? "Detected"
+                                        : "Missing"}
                                 </span>
                             </div>
                         ))}
@@ -120,161 +138,210 @@ function Upload({
                         </button>
                     </div>
 
-                    <h3>Financial Model Validation</h3>
+                    {inspectionResult.model_validation && (
+                        <>
+                            <h3>Financial Model Validation</h3>
 
-                    <div className="mapping-table">
+                            <div className="mapping-table">
 
-                        <div className="mapping-row mapping-header">
-                            <span>Model</span>
-                            <span>Records</span>
-                            <span>Status</span>
-                        </div>
+                                <div className="mapping-row mapping-header">
+                                    <span>Model</span>
+                                    <span>Records</span>
+                                    <span>Status</span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>FACT_GL</span>
-                            <span>
-                                {inspectionResult.model_validation?.fact_gl?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.fact_gl?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.fact_gl?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>FACT_GL</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.fact_gl?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.fact_gl?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.fact_gl?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>DIM_ACCOUNT</span>
-                            <span>
-                                {inspectionResult.model_validation?.dim_account?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.dim_account?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.dim_account?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>DIM_ACCOUNT</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.dim_account?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.dim_account?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.dim_account?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>DIM_FUND</span>
-                            <span>
-                                {inspectionResult.model_validation?.dim_fund?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.dim_fund?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.dim_fund?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>DIM_FUND</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.dim_fund?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.dim_fund?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.dim_fund?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>DIM_DONOR</span>
-                            <span>
-                                {inspectionResult.model_validation?.dim_donor?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.dim_donor?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.dim_donor?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>DIM_DONOR</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.dim_donor?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.dim_donor?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.dim_donor?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>DIM_PROGRAM</span>
-                            <span>
-                                {inspectionResult.model_validation?.dim_program?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.dim_program?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.dim_program?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>DIM_PROGRAM</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.dim_program?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.dim_program?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.dim_program?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>DIM_CATEGORY</span>
-                            <span>
-                                {inspectionResult.model_validation?.dim_category?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.dim_category?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.dim_category?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>DIM_CATEGORY</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.dim_category?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.dim_category?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.dim_category?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>DIM_BUDGET_LINE</span>
-                            <span>
-                                {inspectionResult.model_validation?.dim_budget_line?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.dim_budget_line?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.dim_budget_line?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>DIM_BUDGET_LINE</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.dim_budget_line?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.dim_budget_line?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.dim_budget_line?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>DIM_DONOR_LINE</span>
-                            <span>
-                                {inspectionResult.model_validation?.dim_donor_line?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.dim_donor_line?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.dim_donor_line?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>DIM_DONOR_LINE</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.dim_donor_line?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.dim_donor_line?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.dim_donor_line?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                        <div className="mapping-row">
-                            <span>DIM_CALENDAR</span>
-                            <span>
-                                {inspectionResult.model_validation?.dim_calendar?.record_count ?? 0}
-                            </span>
-                            <span className={
-                                inspectionResult.model_validation?.dim_calendar?.valid
-                                    ? "mapping-success"
-                                    : "mapping-warning"
-                            }>
-                                {inspectionResult.model_validation?.dim_calendar?.valid
-                                    ? "Valid"
-                                    : "Missing"}
-                            </span>
-                        </div>
+                                <div className="mapping-row">
+                                    <span>DIM_CALENDAR</span>
+                                    <span>
+                                        {inspectionResult.model_validation
+                                            ?.dim_calendar?.record_count ?? 0}
+                                    </span>
+                                    <span
+                                        className={
+                                            inspectionResult.model_validation
+                                                ?.dim_calendar?.valid
+                                                ? "mapping-success"
+                                                : "mapping-warning"
+                                        }
+                                    >
+                                        {inspectionResult.model_validation
+                                            ?.dim_calendar?.valid
+                                            ? "Valid"
+                                            : "Missing"}
+                                    </span>
+                                </div>
 
-                    </div>
+                            </div>
+                        </>
+                    )}
 
                 </div>
             )}

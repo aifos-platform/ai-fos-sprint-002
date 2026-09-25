@@ -3,6 +3,12 @@ from app.services.balance_sheet import generate_balance_sheet
 from app.services.financial_analysis import analyze_financials
 from app.services.financial_facts import generate_financial_facts
 from app.services.income_statement import generate_income_statement
+from app.services.standard_income_statement import (
+    generate_standard_income_statement,
+)
+from app.services.standard_balance_sheet import (
+    generate_standard_balance_sheet,
+)
 from app.services.trial_balance import generate_trial_balance
 from app.services.cash_flow import generate_cash_flow_statement
 from datetime import datetime
@@ -11,6 +17,9 @@ from app.services.budget import Budget
 from app.services.needed_budget import NeededBudget
 from app.services.budget_summary import generate_budget_summary
 from app.services.budget_vs_actual import generate_budget_vs_actual
+from app.services.budget_dimension_drilldown import (
+    generate_budget_dimension_drilldown,
+)
 from app.services.budget_actual_classifier import (
     BudgetActualClassifier,
 )
@@ -35,7 +44,41 @@ from app.services.liquidity import calculate_liquidity
 from app.services.funding_gap import (
     generate_funding_gap,
 )
-
+from app.services.financial_trends import generate_financial_trends
+from app.services.financial_forecast import generate_financial_forecast
+from app.services.financial_scenarios import (
+    generate_financial_scenario,
+)
+from app.services.funding_scenarios import (
+    generate_funding_scenario,
+)
+from app.services.scenario_decision_intelligence import (
+    generate_scenario_decision_intelligence,
+)
+from app.services.scenario_comparison_intelligence import (
+    generate_scenario_comparison_intelligence,
+)
+from app.services.forward_risk import (
+    generate_forward_risks,
+)
+from app.services.financial_opportunities import (
+    generate_financial_opportunities,
+)
+from app.services.executive_decision_intelligence import (
+    generate_executive_decision_intelligence,
+)
+from app.services.cfo_report_builder import (
+    build_cfo_report as build_structured_cfo_report,
+)
+from app.services.expected_funding_intelligence import (
+    generate_expected_funding_intelligence,
+)
+from app.services.core_cost_coverage import (
+    generate_core_cost_coverage,
+)
+from app.services.standard_cash_flow_statement import (
+    generate_standard_cash_flow_statement,
+)
 
 class Organization:
     """
@@ -55,10 +98,18 @@ class Organization:
 
         # Reports
         self.balance_sheet = None
+        self.standard_balance_sheet = None
         self.income_statement = None
+        self.standard_income_statement = None
         self.financial_facts = None
         self.financial_analysis = None
+        self.financial_trends = None
+        self.financial_forecast = None
+        self.financial_scenario = None
+        self.scenario_decision_intelligence = None
+        self.scenario_comparison_intelligence = None
         self.cash_flow = None
+        self.standard_cash_flow_statement = None
         self.liquidity = None
 
         # Planning
@@ -70,17 +121,34 @@ class Organization:
         self.needed_budget = NeededBudget()
         self.needed_budget_summary = None
         self.needed_budget_vs_actual = None
+
+        # Prospective Expected Funding
+        self.expected_funding: list[dict[str, Any]] = []
+        self.expected_funding_intelligence = None
         self.funding_gap = None
+
+        self.core_cost_coverage_inputs: list[
+            dict[str, Any]
+        ] = []
+        self.core_cost_coverage = None
         self.fund_knowledge: dict[str, Any] = {}
         self.grants: dict[str, Grant] = {}
         self.grant_diagnostics = None
         self.ai_cfo_report = None
         self.financial_health = None
         self.risk_assessment: list[dict[str, Any]] = []
+        self.forward_risks: list[dict[str, Any]] = []
+        self.financial_opportunities = []
         self.cfo_recommendations: list[dict[str, Any]] = []
+        self.executive_decision_intelligence: dict[str, Any] = {}
         self.kpi_dashboard = None
         self.executive_dashboard = None
+
+        # Existing AI-generated CFO report
         self.cfo_report = None
+
+        # Deterministic structured CFO report
+        self.structured_cfo_report: dict[str, Any] = {}
 
         # Settings
         self.base_currency = None
@@ -200,6 +268,141 @@ class Organization:
             "fiscal_years": fiscal_years,
             "review_count": review_count,
         }  
+
+
+    def load_expected_funding(
+        self,
+        expected_funding_lines: list[
+            dict[str, Any]
+        ],
+    ) -> None:
+        """
+        Store normalized prospective Expected Funding.
+
+        Expected Funding remains separate from secured
+        funding and does not modify Budget, Funding Gap,
+        revenue, or cash.
+        """
+
+        self.expected_funding = [
+            dict(line)
+            for line in (
+                expected_funding_lines or []
+            )
+            if isinstance(
+                line,
+                dict,
+            )
+        ]
+
+    def load_core_cost_coverage(
+        self,
+        core_cost_coverage_lines: list[
+            dict[str, Any]
+        ],
+    ) -> None:
+        """
+        Store normalized Core Cost Coverage records.
+
+        Loading preserves source records and does not
+        infer, allocate, or recalculate financial coverage.
+        """
+
+        self.core_cost_coverage_inputs = [
+            dict(line)
+            for line in (
+                core_cost_coverage_lines or []
+            )
+            if isinstance(
+                line,
+                dict,
+            )
+        ]
+
+    def generate_core_cost_coverage_analysis(
+        self,
+    ) -> None:
+        """
+        Generate deterministic Core Cost Coverage &
+        Allocation Intelligence.
+
+        Needed core costs come from the normalized
+        Needed Budget. Coverage records remain explicit
+        and are applied only by their coverage type.
+        """
+
+        direct_grant_coverage = [
+            line
+            for line in self.core_cost_coverage_inputs
+            if line.get("coverage_type")
+            == "direct_grant_coverage"
+        ]
+
+        indirect_recovery_allocations = [
+            line
+            for line in self.core_cost_coverage_inputs
+            if line.get("coverage_type")
+            == "indirect_recovery_allocation"
+        ]
+
+        unrestricted_core_funding = [
+            line
+            for line in self.core_cost_coverage_inputs
+            if line.get("coverage_type")
+            == "unrestricted_core_funding"
+        ]
+
+        available_indirect_recovery = [
+            line
+            for line in self.core_cost_coverage_inputs
+            if line.get("coverage_type")
+            == "available_indirect_recovery"
+        ]
+
+        used_indirect_recovery = [
+            line
+            for line in self.core_cost_coverage_inputs
+            if line.get("coverage_type")
+            == "used_indirect_recovery"
+        ]
+
+        self.core_cost_coverage = (
+            generate_core_cost_coverage(
+                needed_core_costs=(
+                    self.needed_budget.lines
+                ),
+                direct_grant_coverage=(
+                    direct_grant_coverage
+                ),
+                indirect_recovery_allocations=(
+                    indirect_recovery_allocations
+                ),
+                unrestricted_core_funding=(
+                    unrestricted_core_funding
+                ),
+                available_indirect_recovery=(
+                    available_indirect_recovery
+                ),
+                used_indirect_recovery=(
+                    used_indirect_recovery
+                ),
+            )
+        )
+
+    def generate_expected_funding_analysis(
+        self,
+    ) -> None:
+        """
+        Generate deterministic Expected Funding Intelligence
+        from prospective funding records.
+        """
+
+        self.expected_funding_intelligence = (
+            generate_expected_funding_intelligence(
+                self.expected_funding
+            )
+        )
+
 
     def generate_needed_budget_analysis(
         self,
@@ -325,9 +528,20 @@ class Organization:
             accounts_by_number=self.accounts_by_number,
         )
 
+        self.budget_dimension_drilldown = (
+            generate_budget_dimension_drilldown(
+                budget_lines=self.budget.lines,
+                transactions=transactions_for_analysis,
+                accounts_by_number=self.accounts_by_number,
+            )
+        )        
+
         self.budget_dashboard = generate_budget_dashboard(
             budget_summary=self.budget_summary,
             budget_vs_actual=self.budget_vs_actual,
+            budget_dimension_drilldown=(
+                self.budget_dimension_drilldown
+            ),
         )
 
         self.build_grants()
@@ -793,7 +1007,22 @@ class Organization:
             accounts_by_number=self.accounts_by_number,
         )
 
+        standard_income_statement_transactions = filter_transactions(
+            transactions=self.normalized_general_ledger,
+            start_date=start_date,
+            end_date=end_date,
+        )
+
+        self.standard_income_statement = (
+            generate_standard_income_statement(
+                transactions=period_transactions,
+                accounts_by_number=self.accounts_by_number,
+                validated_income_statement=self.income_statement,
+            )
+        )
+
         self.balance_sheet = generate_balance_sheet(
+
             trial_balance=self.trial_balance,
             accounts_by_number=self.accounts_by_number,
             current_period_result=self.income_statement.get(
@@ -802,11 +1031,25 @@ class Organization:
             ),
         )
 
+        self.standard_balance_sheet = (
+            generate_standard_balance_sheet(
+                trial_balance=self.trial_balance,
+                accounts_by_number=self.accounts_by_number,
+                validated_balance_sheet=self.balance_sheet,
+            )
+        )        
+
         self.cash_flow = generate_cash_flow_statement(
             period_transactions,
             self.trial_balance,
             self.accounts_by_number,
         )
+
+        self.standard_cash_flow_statement = (
+            generate_standard_cash_flow_statement(
+                cash_flow=self.cash_flow,
+            )
+        )        
 
         self.liquidity = calculate_liquidity(
             transactions=period_transactions,
@@ -823,6 +1066,127 @@ class Organization:
             self.income_statement,
             self.balance_sheet,
         )
+
+        self.financial_trends = generate_financial_trends(
+            transactions=period_transactions,
+            accounts_by_number=self.accounts_by_number,
+        ) 
+
+        self.financial_forecast = generate_financial_forecast(
+            financial_trends=self.financial_trends,
+        )  
+
+    def run_financial_scenario(
+        self,
+        *,
+        scenario_name: str = "Custom Scenario",
+        revenue_change_percentage: float = 0.0,
+        expense_change_percentage: float = 0.0,
+        one_time_revenue_adjustment: float = 0.0,
+        one_time_expense_adjustment: float = 0.0,
+        cash_inflow_adjustment: float = 0.0,
+        cash_outflow_adjustment: float = 0.0,
+    ) -> dict[str, Any]:
+        """
+        Run an explicit financial what-if scenario.
+
+        Scenarios are generated only when assumptions are
+        supplied by the user or another AI-FOS workflow.
+
+        The validated baseline financial forecast is never
+        modified.
+        """
+        self.financial_scenario = generate_financial_scenario(
+            financial_forecast=self.financial_forecast,
+            liquidity=self.liquidity,
+            scenario_name=scenario_name,
+            revenue_change_percentage=(
+                revenue_change_percentage
+            ),
+            expense_change_percentage=(
+                expense_change_percentage
+            ),
+            one_time_revenue_adjustment=(
+                one_time_revenue_adjustment
+            ),
+            one_time_expense_adjustment=(
+                one_time_expense_adjustment
+            ),
+            cash_inflow_adjustment=(
+                cash_inflow_adjustment
+            ),
+            cash_outflow_adjustment=(
+                cash_outflow_adjustment
+            ),
+        )
+
+        self.scenario_decision_intelligence = (
+            generate_scenario_decision_intelligence(
+                self.financial_scenario
+            )
+        )
+
+        return self.financial_scenario  
+
+    def compare_financial_scenarios(
+        self,
+        scenario_a: dict[str, Any],
+        scenario_b: dict[str, Any],
+    ) -> dict[str, Any]:
+        """
+        Compare two existing financial scenario decision
+        intelligence outputs.
+
+        This method does not rerun financial scenarios and
+        does not modify either source scenario.
+        """
+
+        self.scenario_comparison_intelligence = (
+            generate_scenario_comparison_intelligence(
+                scenario_a,
+                scenario_b,
+            )
+        )
+
+        return self.scenario_comparison_intelligence
+
+    def run_funding_scenario(
+        self,
+        *,
+        scenario_name: str = "Funding Scenario",
+        expected_funding_change_percentage: float = 0.0,
+        failed_expected_funding_codes: list[str] | None = None,
+        scenario_basis: str = "most_likely",
+    ) -> dict[str, Any]:
+        """
+        Run an explicit Expected Funding what-if scenario.
+
+        Funding scenarios consume only validated Expected
+        Funding Intelligence.
+
+        They do not modify:
+        - secured funding;
+        - Funding Gap;
+        - revenue;
+        - cash;
+        - the validated Expected Funding baseline.
+        """
+
+        self.funding_scenario = generate_funding_scenario(
+            expected_funding_intelligence=(
+                self.expected_funding_intelligence
+            ),
+            scenario_name=scenario_name,
+            expected_funding_change_percentage=(
+                expected_funding_change_percentage
+            ),
+            failed_expected_funding_codes=(
+                failed_expected_funding_codes
+            ),
+            scenario_basis=scenario_basis,
+        )
+
+        return self.funding_scenario                       
 
     def calculate_financial_health(
         self,
@@ -873,6 +1237,44 @@ class Organization:
             funding_gap=self.funding_gap,
         )
 
+    def build_forward_risks(self) -> None:
+        """
+        Build evidence-based forward-looking financial risks.
+
+        Forward-looking risks remain separate from the current
+        CFO Risk Register and consume only validated AI-FOS
+        outputs.
+        """
+
+        self.forward_risks = generate_forward_risks(
+            risk_assessment=self.risk_assessment,
+            financial_trends=self.financial_trends,
+            financial_forecast=self.financial_forecast,
+            liquidity=self.liquidity,
+            funding_gap=self.funding_gap,
+            grant_diagnostics=self.grant_diagnostics,
+        ) 
+
+    def build_financial_opportunities(self) -> None:
+        """
+        Build evidence-based financial opportunities.
+
+        Financial opportunities remain separate from current
+        risks and forward-looking risks and consume only
+        validated AI-FOS outputs.
+        """
+
+        self.financial_opportunities = (
+            generate_financial_opportunities(
+                financial_trends=self.financial_trends,
+                financial_forecast=self.financial_forecast,
+                liquidity=self.liquidity,
+                funding_gap=self.funding_gap,
+                budget_dashboard=self.budget_dashboard,
+                grant_diagnostics=self.grant_diagnostics,
+            )
+        )               
+
     def build_cfo_recommendations(self) -> None:
         """
         Build prioritized evidence-based CFO recommendations.
@@ -884,9 +1286,58 @@ class Organization:
             cash_flow=self.cash_flow,
             financial_health=self.financial_health,
             risk_assessment=self.risk_assessment,
+            financial_opportunities=self.financial_opportunities,
+            forward_risks=self.forward_risks,
             budget_dashboard=self.budget_dashboard,
             grant_diagnostics=self.grant_diagnostics,
+            funding_gap=self.funding_gap,
         )
+
+    def build_executive_decision_intelligence(
+        self,
+    ) -> None:
+        """
+        Build deterministic Executive Decision Intelligence.
+
+        This layer prioritizes existing verified AI-FOS risks,
+        forward-looking risks, CFO recommendations, and financial
+        opportunities for executive management attention.
+
+        It does not recalculate validated financial outputs.
+        """
+
+        self.executive_decision_intelligence = (
+            generate_executive_decision_intelligence(
+                risk_assessment=self.risk_assessment,
+                forward_risks=self.forward_risks,
+                cfo_recommendations=self.cfo_recommendations,
+                financial_opportunities=self.financial_opportunities,
+            )
+        )        
+
+    def build_structured_cfo_report(self) -> None:
+        """
+        Build the deterministic structured AI-FOS CFO Report.
+
+        This report consumes validated financial intelligence
+        outputs and remains separate from the existing AI-written
+        CFO report.
+        """
+
+        self.structured_cfo_report = build_structured_cfo_report(
+            financial_health=self.financial_health,
+            liquidity=self.liquidity,
+            budget_dashboard=self.budget_dashboard,
+            funding_gap=self.funding_gap,
+            grant_diagnostics=self.grant_diagnostics,
+            risk_assessment=self.risk_assessment,
+            forward_risks=self.forward_risks,
+            financial_opportunities=self.financial_opportunities,
+            cfo_recommendations=self.cfo_recommendations,
+            financial_trends=self.financial_trends,
+            financial_forecast=self.financial_forecast,
+            core_cost_coverage=self.core_cost_coverage,
+        )        
 
     def build_kpi_dashboard(self) -> None:
         """

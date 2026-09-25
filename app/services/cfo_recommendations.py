@@ -14,9 +14,13 @@ def generate_cfo_recommendations(
     cash_flow: dict[str, Any] | None,
     financial_health: dict[str, Any] | None,
     risk_assessment: list[dict[str, Any]] | None,
+    forward_risks: list[dict[str, Any]] | None,
+    financial_opportunities: list[dict[str, Any]] | None,
     budget_dashboard: dict[str, Any] | None,
     grant_diagnostics: dict[str, Any] | None,
+    funding_gap: dict[str, Any] | None,
 ) -> list[dict[str, Any]]:
+    
     """
     Generate structured, evidence-based CFO recommendations.
 
@@ -30,8 +34,11 @@ def generate_cfo_recommendations(
     cash_flow = cash_flow or {}
     financial_health = financial_health or {}
     risk_assessment = risk_assessment or []
+    forward_risks = forward_risks or []
+    financial_opportunities = financial_opportunities or []
     budget_dashboard = budget_dashboard or {}
     grant_diagnostics = grant_diagnostics or {}
+    funding_gap = funding_gap or {}
 
     recommendations: list[dict[str, Any]] = []
 
@@ -67,6 +74,102 @@ def generate_cfo_recommendations(
                 "source": "risk_assessment",
             }
         )
+
+    # --------------------------------------------------
+    # Forward-looking risk recommendations
+    # --------------------------------------------------
+
+    for risk in forward_risks:
+        if not isinstance(risk, dict):
+            continue
+
+        severity = str(
+            risk.get("severity") or "Medium"
+        )
+
+        category = str(
+            risk.get("category")
+            or "Forward-Looking Risk"
+        )
+
+        title = str(
+            risk.get("title")
+            or "Emerging financial risk"
+        )
+
+        evidence = str(
+            risk.get("evidence")
+            or "Forward-looking financial evidence identified."
+        )
+
+        action = str(
+            risk.get("recommendation")
+            or (
+                "Review the emerging risk and prepare "
+                "appropriate management action."
+            )
+        )
+
+        recommendations.append(
+            {
+                "priority": severity,
+                "category": category,
+                "title": f"Prepare for {title}",
+                "evidence": evidence,
+                "action": action,
+                "expected_impact": _expected_impact(
+                    category=category,
+                ),
+                "linked_risk": title,
+                "source": "forward_risk",
+            }
+        )
+
+    # --------------------------------------------------
+    # Financial opportunity recommendations
+    # --------------------------------------------------
+
+    for opportunity in financial_opportunities:
+        if not isinstance(opportunity, dict):
+            continue
+
+        priority = str(
+            opportunity.get("priority") or "Medium"
+        )
+
+        category = str(
+            opportunity.get("category")
+            or "Financial Opportunity"
+        )
+
+        title = str(
+            opportunity.get("title")
+            or "Financial opportunity"
+        )
+
+        evidence = str(
+            opportunity.get("evidence")
+            or ""
+        )
+
+        recommended_action = str(
+            opportunity.get("recommended_action")
+            or ""
+        )
+
+        if not recommended_action:
+            continue
+
+        recommendations.append(
+            {
+                "priority": priority,
+                "category": category,
+                "title": recommended_action,
+                "reason": evidence,
+                "linked_opportunity": title,
+                "source": "financial_opportunity",
+            }
+        )        
 
     # --------------------------------------------------
     # 2. Cash-flow recommendations
@@ -169,7 +272,197 @@ def generate_cfo_recommendations(
         )
 
     # --------------------------------------------------
-    # 5. Financial-health recommendation
+    # 5. Funding Gap recommendations
+    # --------------------------------------------------
+
+    funding_gap_summary = funding_gap.get(
+        "summary",
+        {},
+    )
+
+    funding_gap_amount = _to_float(
+        funding_gap_summary.get(
+            "funding_gap"
+        )
+    )
+
+    remaining_requirement = _to_float(
+        funding_gap_summary.get(
+            "remaining_requirement"
+        )
+    )
+
+    applied_secured_funding = _to_float(
+        funding_gap_summary.get(
+            "applied_secured_funding"
+        )
+    )
+
+    period_ineligible_exposure = _to_float(
+        funding_gap_summary.get(
+            "period_ineligible_funding_exposure"
+        )
+    )
+
+    period_unknown_exposure = _to_float(
+        funding_gap_summary.get(
+            "period_unknown_funding_exposure"
+        )
+    )
+
+    dimension_incompatible_exposure = _to_float(
+        funding_gap_summary.get(
+            "dimension_incompatible_funding_exposure"
+        )
+    )
+
+    requirements_with_period_ineligible = int(
+        funding_gap_summary.get(
+            "requirements_with_period_ineligible_funding",
+            0,
+        )
+        or 0
+    )
+
+    requirements_with_period_unknown = int(
+        funding_gap_summary.get(
+            "requirements_with_period_unknown_funding",
+            0,
+        )
+        or 0
+    )
+
+    requirements_with_dimension_incompatible = int(
+        funding_gap_summary.get(
+            "requirements_with_dimension_incompatible_funding",
+            0,
+        )
+        or 0
+    )
+
+    if funding_gap_amount > 0:
+
+        recommendations.append(
+            {
+                "priority": "High",
+                "category": "Funding",
+                "title": "Close the remaining Funding Gap",
+                "evidence": (
+                    f"The organization has a remaining funding "
+                    f"requirement of ${remaining_requirement:,.2f}. "
+                    f"${applied_secured_funding:,.2f} of eligible "
+                    f"secured funding has been applied, leaving "
+                    f"a Funding Gap of ${funding_gap_amount:,.2f}."
+                ),
+                "action": (
+                    "Prioritize a funding plan for the uncovered "
+                    "requirement, including confirmed pipeline "
+                    "opportunities, donor engagement, expenditure "
+                    "reprioritization, and timing of commitments."
+                ),
+                "expected_impact": (
+                    "Reduce exposure to unfunded commitments and "
+                    "improve forward financial sustainability."
+                ),
+                "linked_risk": "Funding Gap",
+                "source": "funding_gap",
+            }
+        )
+
+    if period_ineligible_exposure > 0:
+
+        recommendations.append(
+            {
+                "priority": "High",
+                "category": "Grant Management",
+                "title": "Resolve out-of-period secured funding",
+                "evidence": (
+                    f"${period_ineligible_exposure:,.2f} of "
+                    f"requirement-level secured funding exposure "
+                    f"is outside the applicable grant period "
+                    f"for {requirements_with_period_ineligible} "
+                    f"requirement(s)."
+                ),
+                "action": (
+                    "Review whether replacement funding is needed "
+                    "and whether donor-approved extensions, "
+                    "rephasing, or other permitted grant actions "
+                    "are available. Do not assume expired funding "
+                    "can finance the requirement without evidence."
+                ),
+                "expected_impact": (
+                    "Prevent reliance on funding that is not "
+                    "period-eligible and improve funding-plan "
+                    "credibility."
+                ),
+                "linked_risk": "Grant period eligibility",
+                "source": "funding_gap",
+            }
+        )
+
+    if period_unknown_exposure > 0:
+
+        recommendations.append(
+            {
+                "priority": "Medium",
+                "category": "Data Quality",
+                "title": "Complete missing grant-period evidence",
+                "evidence": (
+                    f"${period_unknown_exposure:,.2f} of "
+                    f"requirement-level secured funding exposure "
+                    f"cannot currently be confirmed as eligible "
+                    f"because grant-period evidence is missing or "
+                    f"incomplete for "
+                    f"{requirements_with_period_unknown} "
+                    f"requirement(s)."
+                ),
+                "action": (
+                    "Complete or correct grant start and end dates "
+                    "in the source budget or grant master data, "
+                    "then rerun the Funding Gap analysis before "
+                    "management relies on these funding balances."
+                ),
+                "expected_impact": (
+                    "Improve confidence in Funding Gap eligibility "
+                    "and reduce uncertainty in management reporting."
+                ),
+                "linked_risk": "Missing grant-period evidence",
+                "source": "funding_gap",
+            }
+        )
+
+    if dimension_incompatible_exposure > 0:
+
+        recommendations.append(
+            {
+                "priority": "Medium",
+                "category": "Funding Allocation",
+                "title": "Review incompatible funding allocations",
+                "evidence": (
+                    f"${dimension_incompatible_exposure:,.2f} of "
+                    f"requirement-level secured funding exposure "
+                    f"could not be applied because known funding "
+                    f"and requirement dimensions conflict for "
+                    f"{requirements_with_dimension_incompatible} "
+                    f"requirement(s)."
+                ),
+                "action": (
+                    "Review the related fund, budget line, program, "
+                    "category, project, and other applicable "
+                    "dimension mappings. Correct source mappings "
+                    "only where supported by financial evidence."
+                ),
+                "expected_impact": (
+                    "Improve allocation accuracy while preserving "
+                    "donor and management restrictions."
+                ),
+                "linked_risk": "Funding allocation incompatibility",
+                "source": "funding_gap",
+            }
+        )
+
+    # --------------------------------------------------
+    # 6. Financial-health recommendation
     # --------------------------------------------------
 
     health_score = _to_float(financial_health.get("score"))
@@ -203,7 +496,7 @@ def generate_cfo_recommendations(
         )
 
     # --------------------------------------------------
-    # 6. Fallback
+    # 7. Fallback
     # --------------------------------------------------
 
     if not recommendations:

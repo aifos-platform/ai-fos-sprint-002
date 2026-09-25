@@ -2,6 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.models import ImportStatus
+from typing import Any
 
 
 class OrganisationCreate(BaseModel):
@@ -45,3 +46,56 @@ class FinancialQuestion(BaseModel):
         min_length=1,
         description="Question to ask the AI-FOS Digital CFO.",
     )
+
+class FinancialScenarioRequest(BaseModel):
+    scenario_name: str = Field(
+        default="Custom Scenario",
+        min_length=1,
+        max_length=255,
+    )
+
+    revenue_change_percentage: float = 0.0
+    expense_change_percentage: float = 0.0
+
+    one_time_revenue_adjustment: float = 0.0
+    one_time_expense_adjustment: float = 0.0
+
+    cash_inflow_adjustment: float = 0.0
+    cash_outflow_adjustment: float = 0.0
+
+
+class ScenarioComparisonRequest(BaseModel):
+    scenario_a: dict[str, Any]
+    scenario_b: dict[str, Any]
+
+class SavedScenarioComparisonRequest(BaseModel):
+    scenario_a_id: str = Field(
+        ...,
+        min_length=1,
+        max_length=255,
+    )
+    scenario_b_id: str = Field(
+        ...,
+        min_length=1,
+        max_length=255,
+    )    
+
+
+class FundingScenarioRequest(BaseModel):
+    scenario_name: str = Field(
+        default="Funding Scenario",
+        min_length=1,
+        max_length=255,
+    )
+
+    expected_funding_change_percentage: float = 0.0
+
+    failed_expected_funding_codes: list[str] = []
+
+    scenario_basis: str = Field(
+        default="most_likely",
+        pattern=(
+            "^(minimum|most_likely|maximum|"
+            "probability_weighted)$"
+        ),
+    )      

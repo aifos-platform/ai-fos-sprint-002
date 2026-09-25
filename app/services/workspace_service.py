@@ -37,7 +37,7 @@ class WorkspaceService:
         the existing workspace is returned.
         """
 
-        organisation_id = organisation_id.strip()
+        organisation_id = organisation_id.strip().lower()
         organisation_name = organisation_name.strip()
         base_currency = base_currency.strip().upper()
 
@@ -47,9 +47,7 @@ class WorkspaceService:
         if not organisation_name:
             raise ValueError("Organisation name is required.")
 
-        existing_workspace = self.get_workspace_by_organisation(
-            organisation_id
-        )
+        existing_workspace = self.get_workspace_by_organisation(organisation_id)
 
         if existing_workspace is not None:
             return existing_workspace
@@ -80,15 +78,41 @@ class WorkspaceService:
             "last_import_at": None,
             "upload_count": 0,
             "document_counts": {},
-            "paths": {
-                name: str(path)
-                for name, path in folders.items()
-            },
+            "paths": {name: str(path) for name, path in folders.items()},
         }
 
         self._write_metadata(workspace_path, metadata)
 
         return metadata
+
+    def ensure_organization_workspace(
+        self,
+        organisation_id: str,
+        organisation_name: str,
+        base_currency: str = "USD",
+    ) -> dict[str, Any]:
+        """
+        Ensure that an organization has exactly one
+        persistent AI-FOS workspace.
+
+        Existing workspaces are reused. A new workspace
+        is created only when none exists.
+        """
+
+        existing_workspace = (
+            self.get_workspace_by_organisation(
+                organisation_id
+            )
+        )
+
+        if existing_workspace is not None:
+            return existing_workspace
+
+        return self.create_workspace(
+            organisation_id=organisation_id,
+            organisation_name=organisation_name,
+            base_currency=base_currency,
+        )    
 
     def get_workspace(
         self,
@@ -114,14 +138,31 @@ class WorkspaceService:
         Find the workspace belonging to an organisation.
         """
 
+        normalized_id = (
+            str(organisation_id)
+            .strip()
+            .lower()
+        )
+
         for metadata_path in self.storage_root.glob(
             "*/metadata.json"
         ):
             metadata = self._read_json(metadata_path)
 
+            workspace_organisation_id = (
+                str(
+                    metadata.get(
+                        "organisation_id",
+                        "",
+                    )
+                )
+                .strip()
+                .lower()
+            )
+
             if (
-                metadata.get("organisation_id")
-                == organisation_id
+                workspace_organisation_id
+                == normalized_id
             ):
                 return metadata
 
@@ -134,12 +175,8 @@ class WorkspaceService:
 
         workspaces: list[dict[str, Any]] = []
 
-        for metadata_path in self.storage_root.glob(
-            "*/metadata.json"
-        ):
-            workspaces.append(
-                self._read_json(metadata_path)
-            )
+        for metadata_path in self.storage_root.glob("*/metadata.json"):
+            workspaces.append(self._read_json(metadata_path))
 
         return sorted(
             workspaces,
@@ -160,55 +197,38 @@ class WorkspaceService:
         metadata = self.get_workspace(workspace_id)
 
         if metadata is None:
-            raise ValueError(
-                f"Workspace '{workspace_id}' was not found."
-            )
+            raise ValueError(f"Workspace '{workspace_id}' was not found.")
 
         source_path = Path(source_file)
 
         if not source_path.exists():
-            raise FileNotFoundError(
-                f"Source file '{source_path}' was not found."
-            )
+            raise FileNotFoundError(f"Source file '{source_path}' was not found.")
 
         workspace_path = self.storage_root / workspace_id
         upload_folder = workspace_path / "uploads"
         upload_folder.mkdir(parents=True, exist_ok=True)
 
-        timestamp = datetime.now(
-            timezone.utc
-        ).strftime("%Y%m%dT%H%M%SZ")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
-        destination_name = (
-            f"{timestamp}_{source_path.name}"
-        )
+        destination_name = f"{timestamp}_{source_path.name}"
 
-        destination_path = (
-            upload_folder / destination_name
-        )
+        destination_path = upload_folder / destination_name
 
         shutil.copy2(
             source_path,
             destination_path,
         )
 
-        document_type = (
-            document_type.strip().lower()
-            or "unknown"
-        )
+        document_type = document_type.strip().lower() or "unknown"
 
         document_counts = metadata.get(
             "document_counts",
             {},
         )
 
-        document_counts[document_type] = (
-            document_counts.get(document_type, 0) + 1
-        )
+        document_counts[document_type] = document_counts.get(document_type, 0) + 1
 
-        metadata["upload_count"] = (
-            metadata.get("upload_count", 0) + 1
-        )
+        metadata["upload_count"] = metadata.get("upload_count", 0) + 1
         metadata["document_counts"] = document_counts
         metadata["last_import_at"] = self._utc_now()
         metadata["updated_at"] = self._utc_now()
@@ -241,9 +261,7 @@ class WorkspaceService:
         metadata = self.get_workspace(workspace_id)
 
         if metadata is None:
-            raise ValueError(
-                f"Workspace '{workspace_id}' was not found."
-            )
+            raise ValueError(f"Workspace '{workspace_id}' was not found.")
 
         metadata["status"] = status.strip()
         metadata["updated_at"] = self._utc_now()
@@ -275,9 +293,7 @@ class WorkspaceService:
         metadata = self.get_workspace(workspace_id)
 
         if metadata is None:
-            raise ValueError(
-                f"Workspace '{workspace_id}' was not found."
-            )
+            raise ValueError(f"Workspace '{workspace_id}' was not found.")
 
         workspace_path = self.storage_root / workspace_id
         model_folder = workspace_path / "financial_model"
@@ -325,9 +341,7 @@ class WorkspaceService:
         metadata = self.get_workspace(workspace_id)
 
         if metadata is None:
-            raise ValueError(
-                f"Workspace '{workspace_id}' was not found."
-            )
+            raise ValueError(f"Workspace '{workspace_id}' was not found.")
 
         workspace_path = self.storage_root / workspace_id
 
@@ -337,15 +351,9 @@ class WorkspaceService:
 
         return {
             **metadata,
-            "stored_uploads": self._count_files(
-                upload_folder
-            ),
-            "financial_model_files": self._count_files(
-                model_folder
-            ),
-            "generated_reports": self._count_files(
-                report_folder
-            ),
+            "stored_uploads": self._count_files(upload_folder),
+            "financial_model_files": self._count_files(model_folder),
+            "generated_reports": self._count_files(report_folder),
         }
 
     def _write_metadata(
@@ -382,14 +390,8 @@ class WorkspaceService:
         if not folder.exists():
             return 0
 
-        return sum(
-            1
-            for path in folder.iterdir()
-            if path.is_file()
-        )
+        return sum(1 for path in folder.iterdir() if path.is_file())
 
     @staticmethod
     def _utc_now() -> str:
-        return datetime.now(
-            timezone.utc
-        ).isoformat()
+        return datetime.now(timezone.utc).isoformat()

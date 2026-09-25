@@ -5,8 +5,13 @@ function Analysis({
 }) {
     const navigate = useNavigate();
 
+    const documentType =
+        inspectionResult?.document_type ?? "unknown";
+
     const detectedColumns =
-        inspectionResult?.detected_columns ?? {};
+        inspectionResult?.detected_columns ??
+        inspectionResult?.budget_mapping ??
+        {};
 
     const detectedFields = Object.values(
         detectedColumns
@@ -24,6 +29,16 @@ function Analysis({
                 )
         );
 
+    const formattedDocumentType =
+        documentType
+            .replaceAll("_", " ")
+            .replace(/\b\w/g, (letter) =>
+                letter.toUpperCase()
+            );
+
+    const isBudget =
+        documentType === "budget";
+
     return (
         <div className="upload-page">
 
@@ -39,11 +54,7 @@ function Analysis({
 
                 <p>
                     ✅ Document recognised:{" "}
-                    {inspectionResult?.document_type
-                        ?.replaceAll("_", " ")
-                        .replace(/\b\w/g, (letter) =>
-                            letter.toUpperCase()
-                        ) ?? "Unknown"}
+                    {formattedDocumentType}
                 </p>
 
                 <p>
@@ -71,14 +82,16 @@ function Analysis({
                             ))}
                         </div>
                     </div>
-                ) : (
+                ) : detectedFields.length > 0 ? (
                     <p>
-                        ✅ No optional fields are missing
+                        ✅ All mapped fields were detected
                     </p>
-                )}
+                ) : null}
 
                 <p>
-                    ✅ Ready to build the financial model
+                    {isBudget
+                        ? "✅ Budget data processed and ready for AI-FOS analysis"
+                        : "✅ Financial model processed and ready for AI-FOS"}
                 </p>
 
                 <div className="mapping-actions">
@@ -87,9 +100,8 @@ function Analysis({
                         type="button"
                         onClick={() => navigate("/import")}
                     >
-                        Import into AI-FOS
+                        View Processing Result →
                     </button>
-
                 </div>
 
             </div>

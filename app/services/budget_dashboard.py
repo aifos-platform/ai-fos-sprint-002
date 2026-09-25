@@ -2,11 +2,15 @@ from typing import Any
 
 from app.services.budget_alerts import generate_budget_alerts
 from app.services.cfo_insights import generate_cfo_insights
+from app.services.budget_dimension_intelligence import (
+    generate_budget_dimension_intelligence,
+)
 
 
 def generate_budget_dashboard(
     budget_summary: dict[str, Any] | None,
     budget_vs_actual: dict[str, Any] | None,
+    budget_dimension_drilldown: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Build an executive dashboard from the budget modules.
@@ -19,6 +23,9 @@ def generate_budget_dashboard(
 
     budget_summary = budget_summary or {}
     budget_vs_actual = budget_vs_actual or {}
+    budget_dimension_drilldown = (
+        budget_dimension_drilldown or {}
+    )
 
     summary = budget_vs_actual.get(
         "summary",
@@ -92,17 +99,54 @@ def generate_budget_dashboard(
                 0,
             ),
         },
-
+        # --------------------------------------------------
+        # Budget analysis dimensions
+        # --------------------------------------------------
         "by_fiscal_year": budget_vs_actual.get(
             "by_fiscal_year",
             {},
         ),
-
+        "by_fund": budget_vs_actual.get(
+            "by_fund",
+            {},
+        ),
+        "by_donor": budget_vs_actual.get(
+            "by_donor",
+            {},
+        ),
+        "by_program": budget_vs_actual.get(
+            "by_program",
+            {},
+        ),
+        "by_category": budget_vs_actual.get(
+            "by_category",
+            {},
+        ),
+        "by_donor_line": budget_vs_actual.get(
+            "by_donor_line",
+            {},
+        ),
+        "by_budget_line": budget_vs_actual.get(
+            "by_budget_line",
+            {},
+        ),
+        "by_project": budget_vs_actual.get(
+            "by_project",
+            {},
+        ),
         "portfolio_control": budget_vs_actual.get(
             "portfolio_control",
             {},
         ),
-
+        # --------------------------------------------------
+        # Cross-dimensional drill-down intelligence
+        # --------------------------------------------------
+        "dimension_drilldown": (
+            budget_dimension_drilldown
+        ),
+        # --------------------------------------------------
+        # Portfolio reference information
+        # --------------------------------------------------
         "largest_funds": budget_summary.get(
             "largest_funds",
             [],
@@ -121,8 +165,18 @@ def generate_budget_dashboard(
         ),
     }
 
-    dashboard["alerts"] = generate_budget_alerts(dashboard)
+    dashboard["dimension_intelligence"] = (
+        generate_budget_dimension_intelligence(
+            dashboard
+        )
+    )
 
-    dashboard["cfo_insights"] = generate_cfo_insights(dashboard)
+    dashboard["alerts"] = generate_budget_alerts(
+        dashboard
+    )
+
+    dashboard["cfo_insights"] = generate_cfo_insights(
+        dashboard
+    )
 
     return dashboard

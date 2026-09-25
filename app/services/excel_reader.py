@@ -25,8 +25,18 @@ from app.services.document_detector import (
 from app.services.gl_mapper import (
     map_gl_columns,
 )
-
-
+from app.services.expected_funding_mapper import (
+    map_expected_funding_columns,
+)
+from app.services.expected_funding_normalizer import (
+    ExpectedFundingNormalizer,
+)
+from app.services.core_cost_coverage_mapper import (
+    map_core_cost_coverage_columns,
+)
+from app.services.core_cost_coverage_normalizer import (
+    CoreCostCoverageNormalizer,
+)
 
 
 def inspect_workbook(
@@ -102,6 +112,28 @@ def inspect_workbook(
     ] = []
 
     needed_budget_sheet_name: str | None = None
+
+    expected_funding_mapping: dict[
+        str,
+        str,
+    ] = {}
+
+    expected_funding_lines: list[
+        dict[str, Any]
+    ] = []
+
+    expected_funding_sheet_name: str | None = None    
+
+    core_cost_coverage_mapping: dict[
+        str,
+        str,
+    ] = {}
+
+    core_cost_coverage_lines: list[
+        dict[str, Any]
+    ] = []
+
+    core_cost_coverage_sheet_name: str | None = None  
 
     #
     # GENERAL LEDGER
@@ -335,6 +367,7 @@ def inspect_workbook(
 
                 break
 
+
         if needed_sheet is not None:
 
             needed_headers = [
@@ -498,6 +531,324 @@ def inspect_workbook(
                         normalized_needed_line
                     )
 
+        #
+        # 3. EXPECTED FUNDING
+        #
+        # Expected Funding is prospective funding and
+        # remains completely separate from secured /
+        # available funding.
+        #
+
+        expected_funding_sheet = None
+
+        for sheet_name in sheet_names:
+
+            if (
+                str(sheet_name)
+                .strip()
+                .lower()
+                == "expected funding"
+            ):
+                expected_funding_sheet = workbook[
+                    sheet_name
+                ]
+
+                expected_funding_sheet_name = (
+                    sheet_name
+                )
+
+                break
+
+
+
+        if expected_funding_sheet is not None:
+
+            expected_headers = [
+                (
+                    str(cell.value).strip()
+                    if cell.value is not None
+                    else ""
+                )
+                for cell in expected_funding_sheet[1]
+            ]
+
+            expected_funding_mapping = (
+                map_expected_funding_columns(
+                    expected_headers
+                )
+            )
+
+            expected_column_indexes = {
+                field_name: (
+                    expected_headers.index(
+                        header_name
+                    )
+                )
+                for (
+                    field_name,
+                    header_name,
+                ) in (
+                    expected_funding_mapping.items()
+                )
+                if header_name
+                in expected_headers
+            }
+
+            expected_normalizer = (
+                ExpectedFundingNormalizer()
+            )
+
+            for row in (
+                expected_funding_sheet.iter_rows(
+                    min_row=2,
+                    values_only=True,
+                )
+            ):
+
+                row_data = {
+                    field_name: row[
+                        column_index
+                    ]
+                    for (
+                        field_name,
+                        column_index,
+                    ) in (
+                        expected_column_indexes.items()
+                    )
+                }
+
+                #
+                # Ignore completely empty worksheet rows.
+                #
+                if not any(
+                    value not in {
+                        None,
+                        "",
+                    }
+                    for value in row_data.values()
+                ):
+                    continue
+
+
+
+                normalized_expected_funding = (
+                    expected_normalizer.normalize_line(
+                        expected_funding_code=(
+                            row_data.get(
+                                "expected_funding_code"
+                            )
+                        ),
+                        funding_name=(
+                            row_data.get(
+                                "funding_name"
+                            )
+                        ),
+                        donor_code=(
+                            row_data.get(
+                                "donor_code"
+                            )
+                        ),
+                        donor_name=(
+                            row_data.get(
+                                "donor_name"
+                            )
+                        ),
+                        stage=(
+                            row_data.get(
+                                "stage"
+                            )
+                        ),
+                        probability_percentage=(
+                            row_data.get(
+                                "probability_percentage"
+                            )
+                        ),
+                        minimum_amount=(
+                            row_data.get(
+                                "minimum_amount"
+                            )
+                        ),
+                        most_likely_amount=(
+                            row_data.get(
+                                "most_likely_amount"
+                            )
+                        ),
+                        maximum_amount=(
+                            row_data.get(
+                                "maximum_amount"
+                            )
+                        ),
+                        expected_decision_date=(
+                            row_data.get(
+                                "expected_decision_date"
+                            )
+                        ),
+                        expected_first_payment_date=(
+                            row_data.get(
+                                "expected_first_payment_date"
+                            )
+                        ),
+                        original_currency=(
+                            row_data.get(
+                                "original_currency"
+                            )
+                        ),
+                        reporting_currency=(
+                            row_data.get(
+                                "reporting_currency"
+                            )
+                        ),
+                        program_code=(
+                            row_data.get(
+                                "program_code"
+                            )
+                        ),
+                        project_code=(
+                            row_data.get(
+                                "project_code"
+                            )
+                        ),
+                        budget_line_code=(
+                            row_data.get(
+                                "budget_line_code"
+                            )
+                        ),
+                        notes=(
+                            row_data.get(
+                                "notes"
+                            )
+                        ),
+                    )
+                )
+
+                expected_funding_lines.append(
+                    normalized_expected_funding
+                )  
+
+        #
+        # 4. CORE COST COVERAGE
+        #
+        # Core Cost Coverage remains separate from
+        # Available Budget and Expected Funding.
+        #
+
+        core_cost_coverage_sheet = None
+
+        for sheet_name in sheet_names:
+
+            if (
+                str(sheet_name)
+                .strip()
+                .lower()
+                == "core cost coverage"
+            ):
+                core_cost_coverage_sheet = workbook[
+                    sheet_name
+                ]
+
+                core_cost_coverage_sheet_name = (
+                    sheet_name
+                )
+
+                break                                  
+
+        if core_cost_coverage_sheet is not None:
+
+            core_cost_coverage_headers = [
+                (
+                    str(cell.value).strip()
+                    if cell.value is not None
+                    else ""
+                )
+                for cell in core_cost_coverage_sheet[1]
+            ]
+
+            core_cost_coverage_mapping = (
+                map_core_cost_coverage_columns(
+                    core_cost_coverage_headers
+                )
+            )
+
+            core_cost_coverage_column_indexes = {
+                field_name: (
+                    core_cost_coverage_headers.index(
+                        header_name
+                    )
+                )
+                for (
+                    field_name,
+                    header_name,
+                ) in (
+                    core_cost_coverage_mapping.items()
+                )
+                if header_name
+                in core_cost_coverage_headers
+            }
+
+            core_cost_coverage_normalizer = (
+                CoreCostCoverageNormalizer()
+            ) 
+
+            for row in (
+                core_cost_coverage_sheet.iter_rows(
+                    min_row=2,
+                    values_only=True,
+                )
+            ):
+
+                row_data = {
+                    field_name: row[
+                        column_index
+                    ]
+                    for (
+                        field_name,
+                        column_index,
+                    ) in (
+                        core_cost_coverage_column_indexes.items()
+                    )
+                }
+
+                #
+                # Ignore completely empty worksheet rows.
+                #
+                if not any(
+                    value not in {
+                        None,
+                        "",
+                    }
+                    for value in row_data.values()
+                ):
+                    continue 
+
+                normalized_core_cost_coverage = (
+                    core_cost_coverage_normalizer.normalize_line(
+                        coverage_type=(
+                            row_data.get(
+                                "coverage_type"
+                            )
+                        ),
+                        fund_code=(
+                            row_data.get(
+                                "fund_code"
+                            )
+                        ),
+                        budget_line_code=(
+                            row_data.get(
+                                "budget_line_code"
+                            )
+                        ),
+                        amount=(
+                            row_data.get(
+                                "amount"
+                            )
+                        ),
+                    )
+                )
+
+                core_cost_coverage_lines.append(
+                    normalized_core_cost_coverage
+                )                                                                  
+
     return {
         "sheet_count": len(
             sheet_names
@@ -537,6 +888,27 @@ def inspect_workbook(
         "needed_budget_lines": (
             needed_budget_lines
         ),
+
+        "expected_funding_sheet_name": (
+            expected_funding_sheet_name
+        ),
+        "expected_funding_mapping": (
+            expected_funding_mapping
+        ),
+        "expected_funding_lines": (
+            expected_funding_lines
+        ),
+
+        "core_cost_coverage_sheet_name": (
+            core_cost_coverage_sheet_name
+        ),
+        "core_cost_coverage_mapping": (
+            core_cost_coverage_mapping
+        ),
+        "core_cost_coverage_lines": (
+            core_cost_coverage_lines
+        ),
+
     }
 
 

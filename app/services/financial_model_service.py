@@ -9,6 +9,7 @@ class FinancialModelService:
     AI-FOS financial model.
     """
 
+
     @staticmethod
     def save_json(
         financial_model_folder: Path,
@@ -116,11 +117,16 @@ class FinancialModelService:
         financial_model_folder: Path,
         trial_balance: Any,
         income_statement: Any,
+        standard_income_statement: Any,
         balance_sheet: Any,
+        standard_balance_sheet: Any,
         cash_flow: Any,
+        standard_cash_flow_statement: Any,
         liquidity: Any,
         financial_facts: Any,
         financial_analysis: Any,
+        financial_trends: Any,
+        financial_forecast: Any,
     ) -> dict[str, str]:
         """
         Persist the calculated financial outputs so
@@ -138,16 +144,35 @@ class FinancialModelService:
                 "income_statement.json",
                 income_statement,
             ),
+            "standard_income_statement": FinancialModelService.save_json(
+                financial_model_folder,
+                "standard_income_statement.json",
+                standard_income_statement,
+            ),
             "balance_sheet": FinancialModelService.save_json(
                 financial_model_folder,
                 "balance_sheet.json",
                 balance_sheet,
+            ),            
+
+            "standard_balance_sheet": FinancialModelService.save_json(
+                financial_model_folder,
+                "standard_balance_sheet.json",
+                standard_balance_sheet,
             ),
+
             "cash_flow": FinancialModelService.save_json(
                 financial_model_folder,
                 "cash_flow.json",
                 cash_flow,
             ),
+
+            "standard_cash_flow_statement": FinancialModelService.save_json(
+                financial_model_folder,
+                "standard_cash_flow_statement.json",
+                standard_cash_flow_statement,
+            ),
+
             "liquidity": FinancialModelService.save_json(
                 financial_model_folder,
                 "liquidity.json",
@@ -163,7 +188,133 @@ class FinancialModelService:
                 "financial_analysis.json",
                 financial_analysis,
             ),
+            "financial_trends": FinancialModelService.save_json(
+                financial_model_folder,
+                "financial_trends.json",
+                financial_trends,
+            ),
+            "financial_forecast": FinancialModelService.save_json(
+                financial_model_folder,
+                "financial_forecast.json",
+                financial_forecast,
+            ),
+
         }
+
+        return {
+            name: str(path)
+            for name, path in files.items()
+        }
+
+    @staticmethod
+    def save_verified_intelligence_outputs(
+        financial_model_folder: Path,
+        financial_health: Any,
+        risk_assessment: Any,
+        forward_risks: Any,
+        financial_opportunities: Any,
+        cfo_recommendations: Any,
+        executive_decision_intelligence: Any,
+    ) -> dict[str, str]:
+        """
+        Persist verified AI-FOS intelligence outputs separately
+        from the core financial model and explicit scenarios.
+        """
+
+        files = {
+            "financial_health": (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "financial_health.json",
+                    financial_health,
+                )
+            ),
+            "risk_assessment": (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "risk_assessment.json",
+                    risk_assessment,
+                )
+            ),
+            "forward_risks": (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "forward_risks.json",
+                    forward_risks,
+                )
+            ),
+            "financial_opportunities": (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "financial_opportunities.json",
+                    financial_opportunities,
+                )
+            ),
+            "cfo_recommendations": (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "cfo_recommendations.json",
+                    cfo_recommendations,
+                )
+            ),
+            "executive_decision_intelligence": (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "executive_decision_intelligence.json",
+                    executive_decision_intelligence,
+                )
+            ),
+        }
+
+        return {
+            name: str(path)
+            for name, path in files.items()
+        }
+
+    @staticmethod
+    def save_scenario_outputs(
+        financial_model_folder: Path,
+        financial_scenario: Any,
+        scenario_decision_intelligence: Any,
+        scenario_comparison_intelligence: Any = None,
+    ) -> dict[str, str]:
+        """
+        Persist explicit financial scenario outputs.
+
+        Scenario artifacts remain separate from the normal
+        financial-processing outputs because scenarios are
+        generated only when explicitly requested.
+
+        The deterministic scenario, its decision intelligence,
+        and optional comparison intelligence are stored as
+        separate artifacts.
+        """
+
+        files = {
+            "financial_scenario": (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "financial_scenario.json",
+                    financial_scenario,
+                )
+            ),
+            "scenario_decision_intelligence": (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "scenario_decision_intelligence.json",
+                    scenario_decision_intelligence,
+                )
+            ),
+        }
+
+        if scenario_comparison_intelligence is not None:
+            files["scenario_comparison_intelligence"] = (
+                FinancialModelService.save_json(
+                    financial_model_folder,
+                    "scenario_comparison_intelligence.json",
+                    scenario_comparison_intelligence,
+                )
+            )
 
         return {
             name: str(path)
