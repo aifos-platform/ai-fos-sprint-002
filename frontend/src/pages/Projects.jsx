@@ -1,17 +1,5 @@
-import { useNavigate } from "react-router-dom";
 
-const navItems = [
-  "Dashboard",
-  "Financial Health",
-  "Financial History",
-  "AI CFO",
-  "Action Center",
-  "Budget",
-  "Grants",
-  "Projects",
-  "Reports",
-  "Settings",
-];
+import AppShell from "../components/AppShell";
 
 function formatCurrency(value) {
     const number = Number(value);
@@ -97,7 +85,6 @@ function Projects({
     currentOrganization,
     setCurrentOrganization,
 }) {
-    const navigate = useNavigate();
 
 
     const summary =
@@ -141,149 +128,15 @@ function Projects({
     const noBudgetCount =
         summary.no_budget_count;
 
-    function handleNavigation(item) {
-        if (item === "Dashboard") {
-            navigate("/dashboard");
-            return;
-        }
-
-        if (item === "Financial Health") {
-            navigate("/financial-health");
-            return;
-        }
-
-        if (item === "AI CFO") {
-            navigate("/ai-cfo");
-            return;
-        }
-
-        if (item === "Action Center") {
-        navigate("/action-center");
-        return;
-        }        
-
-        if (item === "Budget") {
-            navigate("/budget");
-            return;
-        }
-
-        if (item === "Grants") {
-            navigate("/grants");
-            return;
-        }
-
-        if (item === "Projects") {
-            navigate("/projects");
-            return;
-        }
-
-        if (item === "Reports") {
-            navigate("/reports");
-            return;
-        }
-
-        if (item === "Settings") {
-            navigate("/settings");
-            return;
-        }
-
-    }
-
-    function handleOrganizationChange(event) {
-        const selected =
-            organizationList.find(
-                (organization) =>
-                    organization.id ===
-                    event.target.value
-            );
-
-        if (selected) {
-            setCurrentOrganization(selected);
-        }
-    }
-
     return (
-        <div className="projects-page">
-            <aside className="sidebar">
-                <div className="brand">
-                    <div className="brand-mark">
-                        AF
-                    </div>
-
-                    <div>
-                        <h1>AI-FOS</h1>
-                        <p>
-                            Financial Intelligence
-                        </p>
-                    </div>
-                </div>
-
-                <nav className="sidebar-nav">
-                    {navItems.map((item) => (
-                        <button
-                            key={item}
-                            type="button"
-                            className={
-                                item === "Projects"
-                                    ? "nav-item active"
-                                    : "nav-item"
-                            }
-                            onClick={() =>
-                                handleNavigation(item)
-                            }
-                        >
-                            {item}
-                        </button>
-                    ))}
-                </nav>
-            </aside>
-
-            <main className="projects-main">
-                <header className="projects-header">
-                    <div>
-                        <p className="page-eyebrow">
-                            Financial intelligence
-                        </p>
-
-                        <h1>Projects</h1>
-
-                        <p className="page-subtitle">
-                            Organization:{" "}
-                            {currentOrganization?.name ??
-                                "Organization"}
-                        </p>
-                    </div>
-
-                    <div className="projects-header-actions">
-                        <select
-                            value={
-                                currentOrganization?.id ??
-                                "acss"
-                            }
-                            onChange={
-                                handleOrganizationChange
-                            }
-                            className="organization-select"
-                        >
-                            {organizationList.map(
-                                (organization) => (
-                                    <option
-                                        key={organization.id}
-                                        value={organization.id}
-                                    >
-                                        {organization.name}
-                                    </option>
-                                )
-                            )}
-
-                        </select>
-
-                        <div className="user-avatar">
-                            ER
-                        </div>
-                    </div>
-                </header>
-
+        <AppShell
+            eyebrow="Financial intelligence"
+            title="Projects"
+            organizationList={organizationList}
+            currentOrganization={currentOrganization}
+            setCurrentOrganization={setCurrentOrganization}
+            mainClassName="projects-main"
+        >
                 {readiness &&
                     !readiness.has_executive_dashboard && (
                         <section className="projects-section-card">
@@ -605,8 +458,7 @@ function Projects({
                         </section>
                     </>
                 )}
-            </main>
-        </div>
+        </AppShell>
     );
 }
 
