@@ -4,25 +4,8 @@ import {
   useState,
 } from "react";
 
-import {
-  useNavigate,
-} from "react-router-dom";
-
 import api from "../api";
-
-
-const navItems = [
-  "Dashboard",
-  "Financial Health",
-  "Financial History",
-  "AI CFO",
-  "Action Center",
-  "Budget",
-  "Grants",
-  "Projects",
-  "Reports",
-  "Settings",
-];
+import AppShell from "../components/AppShell";
 
 
 function ActionCenter({
@@ -30,8 +13,6 @@ function ActionCenter({
   currentOrganization,
   setCurrentOrganization,
 }) {
-  const navigate = useNavigate();
-
   const [
     actionCenter,
     setActionCenter,
@@ -66,28 +47,6 @@ function ActionCenter({
     actionDrafts,
     setActionDrafts,
   ] = useState({});
-
-
-  const handleNavigation = (item) => {
-    const routes = {
-      Dashboard: "/dashboard",
-      "Financial Health": "/financial-health",
-      "Financial History": "/financial-history",
-      "AI CFO": "/ai-cfo",
-      "Action Center": "/action-center",
-      Budget: "/budget",
-      Grants: "/grants",
-      Projects: "/projects",
-      Reports: "/reports",
-      Settings: "/settings",
-    };
-
-    const route = routes[item];
-
-    if (route) {
-      navigate(route);
-    }
-  };
 
 
   const buildActionDrafts = (
@@ -492,111 +451,13 @@ function ActionCenter({
 
 
   return (
-    <div className="app-shell">
-
-      <aside className="sidebar">
-
-        <div className="brand">
-          <div className="brand-mark">
-            AF
-          </div>
-
-          <div>
-            <h1>AI-FOS</h1>
-
-            <p>
-              Financial Intelligence
-            </p>
-          </div>
-        </div>
-
-
-        <nav className="nav-list">
-          {navItems.map((item) => (
-            <button
-              key={item}
-              className={`nav-item ${
-                item === "Action Center"
-                  ? "active"
-                  : ""
-              }`}
-              type="button"
-              onClick={() =>
-                handleNavigation(item)
-              }
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
-
-      </aside>
-
-
-      <main className="main-content">
-
-        <header className="topbar">
-
-          <div className="dashboard-heading">
-            <p className="eyebrow">
-              Management execution
-            </p>
-
-            <h2>
-              Executive Action Center
-            </h2>
-
-            <p className="card-note">
-              Organization:{" "}
-              {currentOrganization?.name}
-            </p>
-          </div>
-
-
-          <div className="topbar-actions">
-
-            <select
-              className="organization-selector"
-              value={
-                currentOrganization?.id ??
-                ""
-              }
-              onChange={(event) => {
-                const selected =
-                  organizationList.find(
-                    (organization) =>
-                      organization.id ===
-                      event.target.value
-                  );
-
-                if (selected) {
-                  setCurrentOrganization(
-                    selected
-                  );
-                }
-              }}
-            >
-              {organizationList.map(
-                (organization) => (
-                  <option
-                    key={organization.id}
-                    value={organization.id}
-                  >
-                    {organization.name}
-                  </option>
-                )
-              )}
-            </select>
-
-            <div className="user-avatar">
-              ER
-            </div>
-
-          </div>
-
-        </header>
-
-
+    <AppShell
+      eyebrow="Management execution"
+      title="Executive Action Center"
+      organizationList={organizationList}
+      currentOrganization={currentOrganization}
+      setCurrentOrganization={setCurrentOrganization}
+    >
         {error && (
           <section className="card">
             <p className="card-note negative">
@@ -1856,9 +1717,7 @@ function ActionCenter({
 
         )}
 
-      </main>
-
-    </div>
+    </AppShell>
   );
 }
 
