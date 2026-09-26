@@ -114,6 +114,20 @@ class ChartOfAccounts:
                 "totaling",
                 "total formula",
             ],
+            "liquidity_status": [
+                "liquidity status",
+                "liquidity_status",
+                "liquidity",
+                "cash status",
+                "cash availability",
+            ],
+            "balance": [
+                "balance",
+                "account balance",
+                "closing balance",
+                "ending balance",
+                "current balance",
+            ],          
         }
 
         detected_columns: dict[
@@ -321,6 +335,14 @@ class ChartOfAccounts:
             "totaling"
         )
 
+        liquidity_status_column = self.columns.get(
+            "liquidity_status"
+        ) 
+
+        balance_column = self.columns.get(
+            "balance"
+        )               
+
         if (
             account_number_column is None
             or account_name_column is None
@@ -478,6 +500,41 @@ class ChartOfAccounts:
                     value or None
                 )
 
+            liquidity_status = None
+
+            if liquidity_status_column:
+                value = str(
+                    row.get(
+                        liquidity_status_column,
+                        "",
+                    )
+                ).strip()
+
+                liquidity_status = (
+                    value or None
+                )
+
+            balance = None
+
+            if balance_column:
+                balance_value = row.get(
+                    balance_column
+                )
+
+                if (
+                    balance_value is not None
+                    and not pd.isna(balance_value)
+                ):
+                    try:
+                        balance = float(
+                            balance_value
+                        )
+                    except (
+                        TypeError,
+                        ValueError,
+                    ):
+                        balance = None                                
+
             normalized_account = (
                 self.normalizer.normalize_account(
                     account_number=account_number,
@@ -494,6 +551,8 @@ class ChartOfAccounts:
                     income_balance=income_balance,
                     account_type=account_type,
                     totaling=totaling,
+                    liquidity_status=liquidity_status,
+                    balance=balance,
                 )
             )
 
@@ -1133,9 +1192,21 @@ class ChartOfAccounts:
             )
 
             if is_cash_account:
-                account["liquidity_status"] = "Available"
+                if account.get("liquidity_status") not in {
+                    "Available",
+                    "Blocked",
+                }:
+                    account_name = str(
+                        account.get("account_name")
+                        or ""
+                    ).strip().lower()
+
+                    if "blocked" in account_name:
+                        account["liquidity_status"] = "Blocked"
+                    else:
+                        account["liquidity_status"] = "Available"
             else:
-                account["liquidity_status"] = "Not Applicable"            
+                account["liquidity_status"] = "Not Applicable"
 
         self.normalizer.register_accounts(
             self.accounts

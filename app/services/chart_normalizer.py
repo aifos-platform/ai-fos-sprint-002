@@ -44,6 +44,8 @@ class ChartNormalizer:
         income_balance: str | None = None,
         account_type: str | None = None,
         totaling: str | None = None,
+        liquidity_status: str | None = None,
+        balance: float | None = None,
     ) -> dict[str, Any]:
         """
         Convert one imported ERP account into AI-FOS's standard structure.
@@ -65,6 +67,12 @@ class ChartNormalizer:
 
         normal_balance = self._determine_normal_balance(
             normalized_category
+        )
+
+        normalized_liquidity_status = (
+            self._normalize_liquidity_status(
+                liquidity_status
+            )
         )
 
         return {
@@ -92,6 +100,8 @@ class ChartNormalizer:
             ),
             "normal_balance": normal_balance,
             "is_posting_account": is_posting_account,
+            "liquidity_status": normalized_liquidity_status,
+            "balance": balance,
             "classification_confidence": (
                 1.0 if normalized_category else None
             ),
@@ -148,6 +158,34 @@ class ChartNormalizer:
 
         return self.CATEGORY_ALIASES.get(normalized_value)
 
+    def _normalize_liquidity_status(
+        self,
+        liquidity_status: str | None,
+    ) -> str | None:
+        """
+        Normalize imported liquidity-status labels into
+        AI-FOS canonical values.
+        """
+
+        if not liquidity_status:
+            return None
+
+        normalized_value = (
+            str(liquidity_status)
+            .strip()
+            .lower()
+        )
+
+        aliases = {
+            "available": "Available",
+            "blocked": "Blocked",
+            "not applicable": "Not Applicable",
+            "n/a": "Not Applicable",
+            "na": "Not Applicable",
+        }
+
+        return aliases.get(normalized_value)    
+    
     def _is_posting_account(
         self,
         account_type: str | None,
