@@ -4983,3 +4983,228 @@ body {
     width: 100%;
   }
 }
+/* ========================================
+   SETTINGS — PROFESSIONAL POLISH
+   ======================================== */
+
+.settings-main {
+  min-width: 0;
+}
+
+
+/* Settings introduction */
+
+.settings-main .settings-intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 26px;
+  padding: 24px 26px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.025);
+}
+
+.settings-main .settings-intro > div {
+  max-width: 850px;
+}
+
+.settings-main .settings-intro h2 {
+  margin-top: 5px;
+  font-size: 25px;
+  letter-spacing: -0.02em;
+}
+
+.settings-main .settings-intro .primary-button {
+  flex-shrink: 0;
+}
+
+
+/* Settings cards */
+
+.settings-main .settings-card {
+  border-color: #dfe6ee;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.035);
+}
+
+.settings-main .settings-card-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.settings-main .settings-card-header h2 {
+  letter-spacing: -0.01em;
+}
+
+.settings-main .settings-badge {
+  flex-shrink: 0;
+  border: 1px solid #bbf7d0;
+}
+
+.settings-main .settings-badge.system {
+  border-color: #bfdbfe;
+}
+
+
+/* Readiness and data configuration tiles */
+
+.settings-main .settings-data-grid {
+  gap: 14px;
+}
+
+.settings-main .settings-data-grid > div {
+  min-width: 0;
+  min-height: 122px;
+  border-color: #e2e8f0;
+  background: #f8fafc;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.settings-main .settings-data-grid > div:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.04);
+  transform: translateY(-1px);
+}
+
+.settings-main .settings-data-grid strong {
+  font-size: 15px;
+  letter-spacing: -0.005em;
+}
+
+
+/* Organization onboarding form */
+
+.settings-main form .settings-data-grid > div {
+  min-height: 0;
+  background: #ffffff;
+}
+
+.settings-main form .settings-data-grid > div:hover {
+  transform: none;
+}
+
+.settings-main .settings-data-grid label {
+  display: block;
+  margin-bottom: 8px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.settings-main .settings-data-grid input {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+  font-size: 14px;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+.settings-main .settings-data-grid input::placeholder {
+  color: #94a3b8;
+}
+
+.settings-main .settings-data-grid input:hover:not(:disabled) {
+  border-color: #94a3b8;
+}
+
+.settings-main .settings-data-grid input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.settings-main .settings-data-grid input:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.settings-main form .settings-header-actions {
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #edf2f7;
+}
+
+.settings-main form .settings-header-actions .nav-item {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.settings-main form .settings-header-actions .primary-button {
+  min-height: 40px;
+  padding: 9px 17px;
+}
+
+
+/* Organization and governance detail cards */
+
+.settings-main .settings-grid {
+  gap: 18px;
+}
+
+.settings-main .settings-detail-list > div {
+  min-height: 47px;
+}
+
+.settings-main .settings-detail-list strong {
+  max-width: 58%;
+}
+
+
+/* Controlled configuration notices */
+
+.settings-main .settings-warning-note {
+  border-color: #fde68a;
+  box-shadow: 0 1px 3px rgba(146, 64, 14, 0.025);
+}
+
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .settings-main .settings-intro {
+    flex-direction: column;
+  }
+
+  .settings-main .settings-intro .primary-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .settings-main .settings-intro {
+    padding: 20px;
+  }
+
+  .settings-main form .settings-header-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .settings-main form .settings-header-actions .nav-item,
+  .settings-main form .settings-header-actions .primary-button {
+    width: 100%;
+  }
+
+  .settings-main .settings-detail-list strong {
+    max-width: 100%;
+  }
+}
