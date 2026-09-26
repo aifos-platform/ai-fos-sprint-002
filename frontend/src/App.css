@@ -3513,7 +3513,7 @@ body {
 }
 
 /* ========================================
-   ACTION CENTER — PROFESSIONAL POLISH
+   ACTION CENTER â€” PROFESSIONAL POLISH
    ======================================== */
 
 .action-center-page {
@@ -3711,7 +3711,7 @@ body {
 }
 
 /* ========================================
-   ACTION CENTER — EXECUTION CONTROLS
+   ACTION CENTER â€” EXECUTION CONTROLS
    ======================================== */
 
 .action-center-page .action-list {
@@ -3830,7 +3830,7 @@ body {
 }
 
 /* ========================================
-   BUDGET — PROFESSIONAL POLISH
+   BUDGET â€” PROFESSIONAL POLISH
    ======================================== */
 
 .budget-main {
@@ -4123,7 +4123,7 @@ body {
   }
 }
 /* ========================================
-   BUDGET — TABLE & METRIC FINISHING
+   BUDGET â€” TABLE & METRIC FINISHING
    ======================================== */
 
 /* Keep large financial metrics readable */
@@ -4215,4 +4215,266 @@ body {
 .budget-main .budget-table-wrap::-webkit-scrollbar-thumb {
   background: #94a3b8;
   border-radius: 999px;
+}
+
+/* ========================================
+   GRANTS — PROFESSIONAL POLISH
+   ======================================== */
+
+.grants-main {
+  min-width: 0;
+}
+
+
+/* Executive introduction */
+
+.grants-main .grants-intro {
+  max-width: 900px;
+  margin: 0 auto 26px;
+  text-align: center;
+}
+
+.grants-main .grants-intro h2 {
+  margin-top: 5px;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.grants-main .grants-intro > p:last-child {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+
+/* Executive KPI cards */
+
+.grants-main .grants-kpi-grid {
+  gap: 16px;
+}
+
+.grants-main .grants-kpi-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 142px;
+  padding: 21px 22px;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.grants-main .grants-kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: #2563eb;
+}
+
+.grants-main .grants-gap-card::before {
+  background: #ef4444;
+}
+
+.grants-main .grants-kpi-card strong {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.grants-main .grants-progress {
+  height: 6px;
+  background: #e8eef5;
+}
+
+
+/* Main intelligence cards */
+
+.grants-main .grants-section-card {
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.025);
+}
+
+.grants-main .grants-section-heading {
+  margin-bottom: 18px;
+}
+
+.grants-main .grants-section-heading h2 {
+  letter-spacing: -0.01em;
+}
+
+.grants-main .grants-summary-chip {
+  flex-shrink: 0;
+  border: 1px solid #dbeafe;
+  font-size: 12px;
+}
+
+
+/* Funding status */
+
+.grants-main .grants-status-grid {
+  gap: 14px;
+}
+
+.grants-main .grants-status-card {
+  position: relative;
+  min-height: 132px;
+  padding: 19px 20px;
+  overflow: hidden;
+  border-color: #e2e8f0;
+  background: #fbfcfe;
+}
+
+.grants-main .grants-status-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: #94a3b8;
+}
+
+.grants-main .grants-status-card.status-funded::before {
+  background: #16a34a;
+}
+
+.grants-main .grants-status-card.status-partial::before {
+  background: #f59e0b;
+}
+
+.grants-main .grants-status-card.status-unfunded::before {
+  background: #ef4444;
+}
+
+.grants-main .grants-status-card strong {
+  font-size: 26px;
+}
+
+
+/* Requirement reconciliation */
+
+.grants-main .grants-match-row {
+  gap: 12px;
+}
+
+.grants-main .grants-match-row > div {
+  min-width: 0;
+  min-height: 64px;
+  align-items: center;
+  border: 1px solid #edf2f7;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.grants-main .grants-match-row strong {
+  flex-shrink: 0;
+  font-size: 21px;
+}
+
+
+/* Portfolio diagnostics */
+
+.grants-main .grants-two-column {
+  align-items: stretch;
+}
+
+.grants-main .grants-two-column > .grants-section-card {
+  height: 100%;
+}
+
+.grants-main .grants-diagnostic-list > div {
+  min-height: 50px;
+  padding: 12px 0;
+}
+
+.grants-main .grants-diagnostic-list strong {
+  flex-shrink: 0;
+  font-size: 19px;
+}
+
+.grants-main .grants-diagnostic-grid {
+  gap: 12px;
+}
+
+.grants-main .grants-diagnostic-grid > div {
+  display: flex;
+  min-width: 0;
+  min-height: 100px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 17px;
+  border: 1px solid #edf2f7;
+}
+
+.grants-main .grants-diagnostic-grid strong {
+  max-width: 100%;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+
+
+/* Funding Gap insights */
+
+.grants-main .grants-insights-list {
+  gap: 10px;
+}
+
+.grants-main .grants-insight-card {
+  padding: 17px 19px;
+  border: 1px solid #e7edf5;
+  border-left: 3px solid #2563eb;
+  background: #f8fafc;
+  line-height: 1.55;
+}
+
+.grants-main .grants-insight-card:hover {
+  border-color: #cbd5e1;
+  border-left-color: #2563eb;
+  background: #fafcff;
+}
+
+
+/* Empty and evidence states */
+
+.grants-main .grants-empty {
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.grants-main .grants-evidence-note {
+  margin-top: 2px;
+  padding: 18px 24px;
+  border-color: #bfdbfe;
+  background: #f8fbff;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1180px) {
+  .grants-main .grants-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .grants-main .grants-kpi-grid,
+  .grants-main .grants-status-grid,
+  .grants-main .grants-match-row,
+  .grants-main .grants-diagnostic-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .grants-main .grants-intro {
+    text-align: left;
+  }
+
+  .grants-main .grants-intro > p:last-child {
+    margin-left: 0;
+  }
+
+  .grants-main .grants-section-heading {
+    flex-direction: column;
+  }
 }
