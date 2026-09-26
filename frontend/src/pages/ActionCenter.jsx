@@ -458,6 +458,7 @@ function ActionCenter({
       currentOrganization={currentOrganization}
       setCurrentOrganization={setCurrentOrganization}
     >
+      <div className="action-center-page">
         {error && (
           <section className="card">
             <p className="card-note negative">
@@ -1717,6 +1718,7 @@ function ActionCenter({
 
         )}
 
+      </div>
     </AppShell>
   );
 }
