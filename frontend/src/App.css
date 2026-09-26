@@ -3828,3 +3828,391 @@ body {
     min-height: 42px;
   }
 }
+
+/* ========================================
+   BUDGET — PROFESSIONAL POLISH
+   ======================================== */
+
+.budget-main {
+  min-width: 0;
+}
+
+
+/* Executive introduction */
+
+.budget-main .budget-intro {
+  max-width: 900px;
+  margin: 0 auto 26px;
+  text-align: center;
+}
+
+.budget-main .budget-intro h2 {
+  margin-top: 5px;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.budget-main .budget-intro > p:last-child {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+
+/* Executive KPI cards */
+
+.budget-main > .budget-kpi-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.budget-main > .budget-kpi-grid .budget-kpi-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 132px;
+  padding: 21px 22px;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.budget-main > .budget-kpi-grid .budget-kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: #2563eb;
+}
+
+.budget-main > .budget-kpi-grid .budget-kpi-alert::before {
+  background: #f59e0b;
+}
+
+.budget-main > .budget-kpi-grid .budget-kpi-card strong {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+
+/* Main section cards */
+
+.budget-main .budget-section-card {
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.025);
+}
+
+.budget-main .budget-section-heading {
+  margin-bottom: 18px;
+}
+
+.budget-main .budget-section-heading h2 {
+  letter-spacing: -0.01em;
+}
+
+
+/* Control status */
+
+.budget-main .budget-status-card {
+  min-height: 122px;
+  padding: 18px 20px;
+}
+
+.budget-main .budget-status-card strong {
+  font-size: 25px;
+}
+
+
+/* Spending control and portfolio coverage */
+
+.budget-main .budget-two-column {
+  align-items: stretch;
+}
+
+.budget-main .budget-two-column > .budget-section-card {
+  height: 100%;
+}
+
+.budget-main .budget-detail-list > div {
+  min-height: 47px;
+  padding: 12px 0;
+}
+
+.budget-main .budget-coverage-grid > div {
+  display: flex;
+  min-height: 82px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  border: 1px solid #edf2f7;
+}
+
+.budget-main .budget-coverage-grid strong {
+  font-size: 22px;
+}
+
+
+/* Core Cost Coverage unavailable state */
+
+.budget-main .budget-empty-state {
+  margin: 4px 0 0;
+  padding: 24px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+
+/* Professional tables */
+
+.budget-main .budget-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e7ebf0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.budget-main .budget-table {
+  width: 100%;
+  min-width: 760px;
+}
+
+.budget-main .budget-table th {
+  padding: 12px 13px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 10px;
+  letter-spacing: 0.035em;
+  white-space: nowrap;
+}
+
+.budget-main .budget-table td {
+  padding: 14px 13px;
+  line-height: 1.45;
+  vertical-align: middle;
+}
+
+.budget-main .budget-table tbody tr:hover {
+  background: #fafcff;
+}
+
+.budget-main .budget-table-status {
+  white-space: nowrap;
+}
+
+
+/* Fiscal-year view */
+
+.budget-main .budget-section-card > .budget-table-wrap {
+  margin-top: 4px;
+}
+
+
+/* Dimension analysis */
+
+.budget-main .budget-dimension-selector {
+  margin-top: 2px;
+  margin-bottom: 20px;
+}
+
+.budget-main .budget-dimension-intelligence {
+  gap: 12px;
+}
+
+.budget-main .budget-intelligence-card {
+  min-width: 0;
+  min-height: 112px;
+  padding: 17px;
+  overflow: hidden;
+}
+
+.budget-main .budget-intelligence-card strong {
+  overflow-wrap: anywhere;
+  font-size: clamp(17px, 1.45vw, 22px);
+}
+
+
+/* Management attention */
+
+.budget-main .budget-priority-section {
+  margin: 22px 0;
+  padding: 20px;
+  border-color: #dbe3ec;
+}
+
+.budget-main .budget-priority-card {
+  min-width: 0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.budget-main .budget-priority-metrics strong {
+  overflow-wrap: anywhere;
+}
+
+
+/* Detailed dimension table */
+
+.budget-main .budget-priority-section + .budget-table-wrap,
+.budget-main .budget-dimension-intelligence + .budget-table-wrap {
+  margin-top: 18px;
+}
+
+.budget-main .budget-drilldown-button {
+  min-width: 112px;
+  white-space: nowrap;
+}
+
+.budget-main .budget-dimension-row td:first-child {
+  font-weight: 700;
+  color: #102a4c;
+}
+
+
+/* Drill-down */
+
+.budget-main .budget-drilldown-section {
+  border-color: #bfdbfe;
+  background: #f8fbff;
+}
+
+.budget-main
+  .budget-drilldown-section
+  .budget-table-wrap {
+  overflow-x: auto;
+}
+
+
+/* Evidence note */
+
+.budget-main .budget-evidence-note {
+  margin-top: 2px;
+  padding: 18px 24px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1180px) {
+  .budget-main > .budget-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .budget-main > .budget-kpi-grid,
+  .budget-main .budget-status-grid,
+  .budget-main .budget-two-column {
+    grid-template-columns: 1fr;
+  }
+
+  .budget-main .budget-table {
+    min-width: 720px;
+  }
+
+  .budget-main .budget-intro {
+    text-align: left;
+  }
+
+  .budget-main .budget-intro > p:last-child {
+    margin-left: 0;
+  }
+}
+/* ========================================
+   BUDGET — TABLE & METRIC FINISHING
+   ======================================== */
+
+/* Keep large financial metrics readable */
+
+.budget-main .budget-priority-metrics {
+  min-width: 0;
+}
+
+.budget-main .budget-priority-metrics > div {
+  min-width: 0;
+}
+
+.budget-main .budget-priority-metrics strong {
+  max-width: 100%;
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+
+/* Detailed dimension table */
+
+.budget-main .budget-dimension-row {
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.budget-main .budget-dimension-row td {
+  white-space: nowrap;
+}
+
+.budget-main .budget-dimension-row td:nth-child(2) {
+  min-width: 120px;
+  white-space: normal;
+}
+
+.budget-main .budget-dimension-row td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  min-width: 132px;
+  background: #ffffff;
+  box-shadow: -8px 0 12px -12px rgba(15, 23, 42, 0.35);
+}
+
+.budget-main .budget-dimension-row:hover td:last-child {
+  background: #fafcff;
+}
+
+.budget-main .budget-dimension-row.selected td:last-child {
+  background: #eff6ff;
+}
+
+.budget-main .budget-table th:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 3;
+  min-width: 132px;
+  background: #f8fafc;
+  box-shadow: -8px 0 12px -12px rgba(15, 23, 42, 0.35);
+}
+
+.budget-main .budget-drilldown-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 112px;
+  min-height: 36px;
+}
+
+
+/* Cleaner horizontal scrolling */
+
+.budget-main .budget-table-wrap {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #eef2f7;
+}
+
+.budget-main .budget-table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.budget-main .budget-table-wrap::-webkit-scrollbar-track {
+  background: #eef2f7;
+  border-radius: 999px;
+}
+
+.budget-main .budget-table-wrap::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 999px;
+}
