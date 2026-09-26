@@ -1,50 +1,22 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
 const navigationItems = [
-  {
-    label: "Dashboard",
-    path: "/dashboard",
-  },
-  {
-    label: "Financial Health",
-    path: "/financial-health",
-  },
-  {
-    label: "Financial History",
-    path: "/financial-history",
-  },
-  {
-    label: "AI CFO",
-    path: "/ai-cfo",
-  },
-  {
-    label: "Action Center",
-    path: "/action-center",
-  },
-  {
-    label: "Budget",
-    path: "/budget",
-  },
-  {
-    label: "Grants",
-    path: "/grants",
-  },
-  {
-    label: "Projects",
-    path: "/projects",
-  },
-  {
-    label: "Reports",
-    path: "/reports",
-  },
-  {
-    label: "Settings",
-    path: "/settings",
-  },
+  { label: "Dashboard", path: "/dashboard" },
+  { label: "Financial Health", path: "/financial-health" },
+  { label: "Financial History", path: "/financial-history" },
+  { label: "AI CFO", path: "/ai-cfo" },
+  { label: "Action Center", path: "/action-center" },
+  { label: "Budget", path: "/budget" },
+  { label: "Grants", path: "/grants" },
+  { label: "Projects", path: "/projects" },
+  { label: "Reports", path: "/reports" },
+  { label: "Settings", path: "/settings" },
 ];
 
 function AppShell({
   children,
+  eyebrow = "Executive workspace",
+  title,
   organizationList = [],
   currentOrganization,
   setCurrentOrganization,
@@ -103,8 +75,14 @@ function AppShell({
         <header className="topbar">
           <div className="dashboard-heading">
             <p className="eyebrow">
-              Executive workspace
+              {eyebrow}
             </p>
+
+            {title && (
+              <h2>
+                {title}
+              </h2>
+            )}
 
             <p className="card-note">
               Organization:{" "}
@@ -117,8 +95,12 @@ function AppShell({
             {organizationList.length > 0 && (
               <select
                 className="organization-selector"
-                value={currentOrganization?.id ?? ""}
-                onChange={handleOrganizationChange}
+                value={
+                  currentOrganization?.id ?? ""
+                }
+                onChange={
+                  handleOrganizationChange
+                }
               >
                 {organizationList.map(
                   (organization) => (
@@ -143,7 +125,9 @@ function AppShell({
               </button>
             )}
 
-            <div className="user-avatar">ER</div>
+            <div className="user-avatar">
+              ER
+            </div>
           </div>
         </header>
 
