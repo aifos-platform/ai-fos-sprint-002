@@ -4478,3 +4478,238 @@ body {
     flex-direction: column;
   }
 }
+
+/* ========================================
+   PROJECTS — PROFESSIONAL POLISH
+   ======================================== */
+
+.projects-main {
+  min-width: 0;
+}
+
+
+/* Executive introduction */
+
+.projects-main .projects-intro {
+  max-width: 900px;
+  margin: 0 auto 26px;
+  text-align: center;
+}
+
+.projects-main .projects-intro h2 {
+  margin-top: 5px;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.projects-main .projects-intro > p:last-child {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+
+/* Executive KPI cards */
+
+.projects-main .projects-kpi-grid {
+  gap: 16px;
+}
+
+.projects-main .projects-kpi-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 142px;
+  padding: 21px 22px;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.projects-main .projects-kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: #2563eb;
+}
+
+.projects-main .projects-kpi-card strong {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.projects-main .projects-progress {
+  height: 6px;
+  background: #e8eef5;
+}
+
+
+/* Main portfolio cards */
+
+.projects-main .projects-section-card {
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.025);
+}
+
+.projects-main .projects-section-heading {
+  margin-bottom: 18px;
+}
+
+.projects-main .projects-section-heading h2 {
+  letter-spacing: -0.01em;
+}
+
+.projects-main .projects-summary-chip {
+  flex-shrink: 0;
+  border: 1px solid #dbeafe;
+  font-size: 12px;
+}
+
+
+/* Project budget status */
+
+.projects-main .projects-status-grid {
+  gap: 14px;
+}
+
+.projects-main .projects-status-card {
+  position: relative;
+  min-height: 132px;
+  padding: 19px 20px;
+  overflow: hidden;
+  border-color: #e2e8f0;
+  background: #fbfcfe;
+}
+
+.projects-main .projects-status-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: #94a3b8;
+}
+
+.projects-main .projects-status-card.project-status-over::before {
+  background: #ef4444;
+}
+
+.projects-main .projects-status-card.project-status-within::before {
+  background: #16a34a;
+}
+
+.projects-main .projects-status-card.project-status-none::before {
+  background: #f59e0b;
+}
+
+.projects-main .projects-status-card strong {
+  font-size: 26px;
+}
+
+
+/* Detailed project portfolio table */
+
+.projects-main .projects-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e7ebf0;
+  border-radius: 12px;
+  background: #ffffff;
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #eef2f7;
+}
+
+.projects-main .projects-table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.projects-main .projects-table-wrap::-webkit-scrollbar-track {
+  background: #eef2f7;
+  border-radius: 999px;
+}
+
+.projects-main .projects-table-wrap::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 999px;
+}
+
+.projects-main .projects-table {
+  min-width: 950px;
+}
+
+.projects-main .projects-table th {
+  padding: 12px 13px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 10px;
+  letter-spacing: 0.035em;
+  white-space: nowrap;
+}
+
+.projects-main .projects-table td {
+  padding: 14px 13px;
+  line-height: 1.45;
+  vertical-align: middle;
+}
+
+.projects-main .projects-table tbody tr {
+  transition: background 0.16s ease;
+}
+
+.projects-main .projects-table tbody tr:hover {
+  background: #fafcff;
+}
+
+.projects-main .projects-table td:first-child {
+  font-weight: 700;
+  color: #102a4c;
+}
+
+.projects-main .projects-table-status {
+  white-space: nowrap;
+}
+
+
+/* Empty and evidence states */
+
+.projects-main .projects-empty {
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.projects-main .projects-evidence-note {
+  margin-top: 2px;
+  padding: 18px 24px;
+  border-color: #bfdbfe;
+  background: #f8fbff;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1180px) {
+  .projects-main .projects-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .projects-main .projects-kpi-grid,
+  .projects-main .projects-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .projects-main .projects-intro {
+    text-align: left;
+  }
+
+  .projects-main .projects-intro > p:last-child {
+    margin-left: 0;
+  }
+
+  .projects-main .projects-section-heading {
+    flex-direction: column;
+  }
+}
