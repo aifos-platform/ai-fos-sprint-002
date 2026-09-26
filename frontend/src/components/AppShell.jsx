@@ -21,6 +21,7 @@ function AppShell({
   currentOrganization,
   setCurrentOrganization,
   onUploadData,
+  mainClassName = "",
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,7 +72,9 @@ function AppShell({
         </nav>
       </aside>
 
-      <main className="main-content">
+      <main
+        className={`main-content ${mainClassName}`.trim()}
+      >
         <header className="topbar">
           <div className="dashboard-heading">
             <p className="eyebrow">

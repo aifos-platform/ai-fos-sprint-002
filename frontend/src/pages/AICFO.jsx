@@ -5,24 +5,9 @@ import {
 } from "react";
 import ReactMarkdown from "react-markdown";
 
-import { useNavigate } from "react-router-dom";
-
 import api from "../api";
+import AppShell from "../components/AppShell";
 import "./AICFO.css";
-
-
-const navItems = [
-  "Dashboard",
-  "Financial Health",
-  "Financial History",
-  "AI CFO",
-  "Action Center",
-  "Budget",
-  "Grants",
-  "Projects",
-  "Reports",
-  "Settings",
-];
 
 
 function AICFO({
@@ -31,8 +16,6 @@ function AICFO({
   currentOrganization,
   setCurrentOrganization,
 }) {
-  const navigate = useNavigate();
-
   const [catalog, setCatalog] = useState([]);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
 
@@ -55,19 +38,6 @@ function AICFO({
 
   const hasFinancialIntelligence =
     readiness?.has_executive_dashboard === true;
-
-
-  const handleOrganizationChange = (event) => {
-    const selected =
-      organizationList.find(
-        (organization) =>
-          organization.id === event.target.value
-      );
-
-    if (selected) {
-      setCurrentOrganization(selected);
-    }
-  };
 
 
   useEffect(() => {
@@ -240,132 +210,15 @@ function AICFO({
   };
 
 
-  const handleNavigation = (
-    item
-  ) => {
-    if (item === "Dashboard") {
-      navigate("/dashboard");
-      return;
-    }
-
-    if (item === "Financial Health") {
-      navigate("/financial-health");
-      return;
-    }
-
-    if (item === "AI CFO") {
-      navigate("/ai-cfo");
-      return;
-    }
-
-    if (item === "Action Center") {
-      navigate("/action-center");
-      return;
-    }    
-
-    if (item === "Budget") {
-      navigate("/budget");
-      return;
-    }
-
-    if (item === "Grants") {
-      navigate("/grants");
-      return;
-    }
-
-    if (item === "Projects") {
-      navigate("/projects");
-      return;
-    }
-
-    if (item === "Reports") {
-      navigate("/reports");
-      return;
-    }
-
-    if (item === "Settings") {
-      navigate("/settings");
-      return;
-    }
-  };
-
-
   return (
-    <div className="app-shell">
-
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">
-            AF
-          </div>
-
-          <div>
-            <h1>AI-FOS</h1>
-            <p>Financial Intelligence</p>
-          </div>
-        </div>
-
-        <nav className="nav-list">
-          {navItems.map((item) => (
-            <button
-              key={item}
-              className={`nav-item ${item === "AI CFO"
-                ? "active"
-                : ""
-                }`}
-              type="button"
-              onClick={() =>
-                handleNavigation(item)
-              }
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-
-      <main className="main-content ai-cfo-main">
-
-        <header className="topbar">
-          <div className="dashboard-heading">
-            <p className="eyebrow">
-              Financial intelligence
-            </p>
-
-            <h2>AI CFO</h2>
-
-            <p className="card-note">
-              Organization: {organisationName}
-            </p>
-          </div>
-
-          <div className="topbar-actions">
-            <select
-              value={currentOrganization?.id ?? ""}
-              onChange={handleOrganizationChange}
-              className="organization-selector"
-              aria-label="Current organization"
-            >
-              {organizationList.map(
-                (organization) => (
-                  <option
-                    key={organization.id}
-                    value={organization.id}
-                  >
-                    {organization.name}
-                  </option>
-                )
-              )}
-            </select>
-
-            <div className="user-avatar">
-              ER
-            </div>
-          </div>
-        </header>
-
-
+    <AppShell
+      eyebrow="Financial intelligence"
+      title="AI CFO"
+      organizationList={organizationList}
+      currentOrganization={currentOrganization}
+      setCurrentOrganization={setCurrentOrganization}
+      mainClassName="ai-cfo-main"
+    >
         {!hasFinancialIntelligence ? (
 
           <section className="ai-cfo-section">
@@ -671,9 +524,7 @@ function AICFO({
 
         )}
 
-      </main>
-
-    </div>
+    </AppShell>
   );
 }
 
