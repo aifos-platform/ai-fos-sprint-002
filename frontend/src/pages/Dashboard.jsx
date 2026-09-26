@@ -236,7 +236,9 @@ function Dashboard({
             </div>
           </article>
 
-          <article className="card">
+          <div className="dashboard-support-grid">
+
+          <article className="card dashboard-support-card">
             <p className="card-label">
               Budget utilisation
             </p>
@@ -267,7 +269,7 @@ function Dashboard({
             </div>
           </article>
 
-          <article className="card">
+          <article className="card dashboard-support-card">
             <p className="card-label">
               Active grants
             </p>
@@ -283,7 +285,7 @@ function Dashboard({
             </p>
           </article>
 
-          <article className="card">
+          <article className="card dashboard-support-card">
             <p className="card-label">
               Donors
             </p>
@@ -296,6 +298,7 @@ function Dashboard({
               Funding relationships
             </p>
           </article>
+        </div>
         </section>
       )}
     </AppShell>
