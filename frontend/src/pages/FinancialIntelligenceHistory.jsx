@@ -305,6 +305,7 @@ function FinancialIntelligenceHistory({
       currentOrganization={currentOrganization}
       setCurrentOrganization={setCurrentOrganization}
     >
+      <div className="financial-history-page">
         {error && (
           <section className="card">
             <p className="card-note negative">
@@ -1235,6 +1236,7 @@ function FinancialIntelligenceHistory({
           </>
 
         )}
+      </div>
 
     </AppShell>
   );
