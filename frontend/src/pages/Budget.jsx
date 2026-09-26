@@ -3,20 +3,7 @@ import {
     useRef,
     useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
-
-const navItems = [
-  "Dashboard",
-  "Financial Health",
-  "Financial History",
-  "AI CFO",
-  "Action Center",
-  "Budget",
-  "Grants",
-  "Projects",
-  "Reports",
-  "Settings",
-];
+import AppShell from "../components/AppShell";
 
 const budgetDimensions = [
     {
@@ -136,8 +123,6 @@ function Budget({
     currentOrganization,
     setCurrentOrganization,
 }) {
-    const navigate = useNavigate();
-
     const [selectedDimension, setSelectedDimension] =
         useState("fund");
 
@@ -319,164 +304,15 @@ function Budget({
         });
     }, [activeDrilldownRecord]);
 
-    function handleNavigation(item) {
-        if (item === "Dashboard") {
-            navigate("/dashboard");
-            return;
-        }
-
-        if (item === "Financial Health") {
-            navigate("/financial-health");
-            return;
-        }
-
-        if (item === "AI CFO") {
-            navigate("/ai-cfo");
-            return;
-        }
-
-        if (item === "Action Center") {
-        navigate("/action-center");
-        return;
-        }        
-
-        if (item === "Budget") {
-            navigate("/budget");
-            return;
-        }
-
-        if (item === "Grants") {
-            navigate("/grants");
-            return;
-        }
-
-        if (item === "Projects") {
-            navigate("/projects");
-            return;
-        }
-
-        if (item === "Reports") {
-            navigate("/reports");
-            return;
-        }
-
-        if (item === "Settings") {
-            navigate("/settings");
-        }
-    }
-
-    function handleOrganizationChange(
-        event
-    ) {
-        const selected =
-            organizationList.find(
-                (organizationItem) =>
-                    organizationItem.id ===
-                    event.target.value
-            );
-
-        if (selected) {
-            setCurrentOrganization(selected);
-        }
-    }
-
     return (
-        <div className="budget-page">
-            <aside className="sidebar">
-                <div className="brand">
-                    <div className="brand-mark">
-                        AF
-                    </div>
-
-                    <div>
-                        <h1>AI-FOS</h1>
-
-                        <p>
-                            Financial Intelligence
-                        </p>
-                    </div>
-                </div>
-
-                <nav className="sidebar-nav">
-                    {navItems.map(
-                        (item) => (
-                            <button
-                                key={item}
-                                type="button"
-                                className={
-                                    item ===
-                                        "Budget"
-                                        ? "nav-item active"
-                                        : "nav-item"
-                                }
-                                onClick={() =>
-                                    handleNavigation(
-                                        item
-                                    )
-                                }
-                            >
-                                {item}
-                            </button>
-                        )
-                    )}
-                </nav>
-            </aside>
-
-            <main className="budget-main">
-                <header className="budget-header">
-                    <div>
-                        <p className="page-eyebrow">
-                            Financial intelligence
-                        </p>
-
-                        <h1>Budget</h1>
-
-                        <p className="page-subtitle">
-                            Organization:{" "}
-                            {currentOrganization?.name ??
-                                "Organization"}
-                        </p>
-                    </div>
-
-                    <div className="budget-header-actions">
-                        <select
-                            value={
-                                currentOrganization?.id ??
-                                "acss"
-                            }
-                            onChange={
-                                handleOrganizationChange
-                            }
-                            className="organization-select"
-                        >
-                            {organizationList.map(
-                                (
-                                    organizationItem
-                                ) => (
-                                    <option
-                                        key={
-                                            organizationItem.id
-                                        }
-                                        value={
-                                            organizationItem.id
-                                        }
-                                    >
-                                        {
-                                            organizationItem.name
-                                        }
-                                    </option>
-                                )
-                            )}
-                        </select>
-
-                        <div className="user-avatar">
-                            ER
-                        </div>
-                    </div>
-                </header>
-
-
-
+        <AppShell
+            eyebrow="Financial intelligence"
+            title="Budget"
+            organizationList={organizationList}
+            currentOrganization={currentOrganization}
+            setCurrentOrganization={setCurrentOrganization}
+            mainClassName="budget-main"
+        >
                 {readiness &&
                     !readiness.has_budget && (
                         <section className="budget-section-card">
@@ -1906,8 +1742,7 @@ function Budget({
                         </section>
                     </>
                 )}
-            </main>
-        </div>
+        </AppShell>
     );
 }
 
