@@ -1,20 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import api from "../api";
-
-const navItems = [
-  "Dashboard",
-  "Financial Health",
-  "Financial History",
-  "AI CFO",
-  "Action Center",
-  "Budget",
-  "Grants",
-  "Projects",
-  "Reports",
-  "Settings",
-];
+import AppShell from "../components/AppShell";
 
 const reportSections = [
   "Executive Summary",
@@ -36,73 +23,12 @@ function Reports({
   currentOrganization,
   setCurrentOrganization,
 }) {
-  const navigate = useNavigate();
 
   const [downloadStatus, setDownloadStatus] =
     useState("");
 
   const [isDownloading, setIsDownloading] =
     useState(false);
-
-  function handleNavigation(item) {
-    if (item === "Dashboard") {
-      navigate("/dashboard");
-      return;
-    }
-
-    if (item === "Financial Health") {
-      navigate("/financial-health");
-      return;
-    }
-
-    if (item === "AI CFO") {
-      navigate("/ai-cfo");
-      return;
-    }
-
-    if (item === "Action Center") {
-      navigate("/action-center");
-      return;
-    }    
-
-    if (item === "Budget") {
-      navigate("/budget");
-      return;
-    }
-
-    if (item === "Grants") {
-      navigate("/grants");
-      return;
-    }
-
-    if (item === "Projects") {
-      navigate("/projects");
-      return;
-    }
-
-    if (item === "Reports") {
-      navigate("/reports");
-      return;
-    }
-
-    if (item === "Settings") {
-      navigate("/settings");
-      return;
-    }
-  }
-
-  function handleOrganizationChange(event) {
-    const selected =
-      organizationList.find(
-        (organization) =>
-          organization.id ===
-          event.target.value
-      );
-
-    if (selected) {
-      setCurrentOrganization(selected);
-    }
-  }
 
   async function handleDownloadCfoReport(
     format = "pdf"
@@ -217,87 +143,14 @@ function Reports({
   }
 
   return (
-    <div className="reports-center-page">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">
-            AF
-          </div>
-
-          <div>
-            <h1>AI-FOS</h1>
-
-            <p>
-              Financial Intelligence
-            </p>
-          </div>
-        </div>
-
-        <nav className="sidebar-nav">
-          {navItems.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={
-                item === "Reports"
-                  ? "nav-item active"
-                  : "nav-item"
-              }
-              onClick={() =>
-                handleNavigation(item)
-              }
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-      <main className="reports-center-main">
-        <header className="reports-center-header">
-          <div>
-            <p className="page-eyebrow">
-              Financial reporting
-            </p>
-
-            <h1>Report Center</h1>
-
-            <p className="page-subtitle">
-              Organization:{" "}
-              {currentOrganization?.name ??
-                "Organization"}
-            </p>
-          </div>
-
-          <div className="reports-center-actions">
-            <select
-              value={
-                currentOrganization?.id ??
-                "acss"
-              }
-              onChange={
-                handleOrganizationChange
-              }
-              className="organization-select"
-            >
-              {organizationList.map(
-                (organization) => (
-                  <option
-                    key={organization.id}
-                    value={organization.id}
-                  >
-                    {organization.name}
-                  </option>
-                )
-              )}
-            </select>
-
-            <div className="user-avatar">
-              ER
-            </div>
-          </div>
-        </header>
-
+    <AppShell
+      eyebrow="Financial reporting"
+      title="Report Center"
+      organizationList={organizationList}
+      currentOrganization={currentOrganization}
+      setCurrentOrganization={setCurrentOrganization}
+      mainClassName="reports-center-main"
+    >
         {readiness &&
           !readiness.has_executive_dashboard && (
             <section className="reports-featured-card">
@@ -645,8 +498,7 @@ function Reports({
             </section>
           </>
         )}
-      </main>
-    </div>
+    </AppShell>
   );
 }
 
