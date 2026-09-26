@@ -2,25 +2,8 @@ import {
   useState,
 } from "react";
 
-import {
-  useNavigate,
-} from "react-router-dom";
-
 import api from "../api";
-
-
-const navItems = [
-  "Dashboard",
-  "Financial Health",
-  "Financial History",
-  "AI CFO",
-  "Action Center",
-  "Budget",
-  "Grants",
-  "Projects",
-  "Reports",
-  "Settings",
-];
+import AppShell from "../components/AppShell";
 
 
 function availabilityLabel(value) {
@@ -37,7 +20,6 @@ function Settings({
   setCurrentOrganization,
   refreshOrganizationRegistry,
 }) {
-  const navigate = useNavigate();
 
   const [
     showAddOrganization,
@@ -67,67 +49,6 @@ function Settings({
     isCreatingOrganization,
     setIsCreatingOrganization,
   ] = useState(false);
-
-
-  function handleNavigation(item) {
-    if (item === "Dashboard") {
-      navigate("/dashboard");
-      return;
-    }
-
-    if (item === "Financial Health") {
-      navigate("/financial-health");
-      return;
-    }
-
-    if (item === "AI CFO") {
-      navigate("/ai-cfo");
-      return;
-    }
-
-    if (item === "Action Center") {
-      navigate("/action-center");
-      return;
-    }    
-
-    if (item === "Budget") {
-      navigate("/budget");
-      return;
-    }
-
-    if (item === "Grants") {
-      navigate("/grants");
-      return;
-    }
-
-    if (item === "Projects") {
-      navigate("/projects");
-      return;
-    }
-
-    if (item === "Reports") {
-      navigate("/reports");
-      return;
-    }
-
-    if (item === "Settings") {
-      navigate("/settings");
-    }
-  }
-
-
-  function handleOrganizationChange(event) {
-    const selected =
-      organizationList.find(
-        (organization) =>
-          organization.id ===
-          event.target.value
-      );
-
-    if (selected) {
-      setCurrentOrganization(selected);
-    }
-  }
 
 
   function handleNewOrganizationChange(
@@ -304,120 +225,14 @@ function Settings({
 
 
   return (
-    <div className="settings-page">
-
-      <aside className="sidebar">
-
-        <div className="brand">
-
-          <div className="brand-mark">
-            AF
-          </div>
-
-          <div>
-            <h1>AI-FOS</h1>
-
-            <p>
-              Financial Intelligence
-            </p>
-          </div>
-
-        </div>
-
-
-        <nav className="sidebar-nav">
-
-          {navItems.map((item) => (
-
-            <button
-              key={item}
-              type="button"
-              className={
-                item === "Settings"
-                  ? "nav-item active"
-                  : "nav-item"
-              }
-              onClick={() =>
-                handleNavigation(item)
-              }
-            >
-              {item}
-            </button>
-
-          ))}
-
-        </nav>
-
-      </aside>
-
-
-      <main className="settings-main">
-
-        <header className="settings-header">
-
-          <div>
-
-            <p className="page-eyebrow">
-              Organization configuration
-            </p>
-
-            <h1>
-              Settings
-            </h1>
-
-            <p className="page-subtitle">
-              Organization:{" "}
-              {currentOrganization?.name ??
-                "Organization"}
-            </p>
-
-          </div>
-
-
-          <div className="settings-header-actions">
-
-            <select
-              value={
-                currentOrganization?.id ??
-                ""
-              }
-              onChange={
-                handleOrganizationChange
-              }
-              className="organization-select"
-            >
-
-              {organizationList.map(
-                (organizationOption) => (
-
-                  <option
-                    key={
-                      organizationOption.id
-                    }
-                    value={
-                      organizationOption.id
-                    }
-                  >
-                    {
-                      organizationOption.name
-                    }
-                  </option>
-
-                )
-              )}
-
-            </select>
-
-
-            <div className="user-avatar">
-              ER
-            </div>
-
-          </div>
-
-        </header>
-
-
+    <AppShell
+      eyebrow="Organization configuration"
+      title="Settings"
+      organizationList={organizationList}
+      currentOrganization={currentOrganization}
+      setCurrentOrganization={setCurrentOrganization}
+      mainClassName="settings-main"
+    >
         <section className="settings-intro">
 
           <div>
@@ -1314,9 +1129,7 @@ function Settings({
 
         </section>
 
-      </main>
-
-    </div>
+    </AppShell>
   );
 }
 
