@@ -1231,6 +1231,11 @@ class Organization:
                 funding_gap=(
                     self.funding_gap
                 ),
+
+                budget_mapping_intelligence=(
+                    self.budget_mapping_intelligence
+                ),
+
             )
         )
 

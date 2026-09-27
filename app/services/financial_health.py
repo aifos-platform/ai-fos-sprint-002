@@ -8,6 +8,7 @@ def calculate_financial_health(
     grant_diagnostics: dict[str, Any] | None,
     liquidity: dict[str, Any] | None,
     funding_gap: dict[str, Any] | None = None,
+    budget_mapping_intelligence: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Calculate the transparent AI-FOS Financial Health Score.
@@ -50,6 +51,30 @@ def calculate_financial_health(
 
     funding_gap = (
         funding_gap or {}
+    )
+
+    budget_mapping_intelligence = (
+        budget_mapping_intelligence or {}
+    )
+
+    budget_mapping_summary = (
+        budget_mapping_intelligence.get(
+            "summary",
+            {},
+        )
+        or {}
+    )
+
+    broader_match_actual = _to_float(
+        budget_mapping_summary.get(
+            "broader_match_actual"
+        )
+    )
+
+    no_budget_identified_actual = _to_float(
+        budget_mapping_summary.get(
+            "no_budget_identified_actual"
+        )
     )
 
     category_scores: dict[
@@ -387,19 +412,43 @@ def calculate_financial_health(
         and unbudgeted_ratio is not None
     ):
 
-        budget_reason = (
-            f"Budget utilization is "
-            f"{utilization_percentage:.2f}% and "
-            f"unbudgeted actual spending is "
-            f"{unbudgeted_actual:,.2f}, representing "
-            f"{unbudgeted_ratio * 100:.2f}% of total "
-            f"budget. {over_budget_count} aggregated "
-            f"budget line code(s) are above budget and "
-            f"{no_budget_count} aggregated budget line "
-            f"code(s) have actual activity with no "
-            f"budget amount identified in the current "
-            f"portfolio view."
-        )
+        if budget_mapping_summary:
+
+            budget_reason = (
+                f"Budget utilization is "
+                f"{utilization_percentage:.2f}%. Strict "
+                f"budget-line matching identified "
+                f"{unbudgeted_actual:,.2f} of actual spending "
+                f"without an exact budget-line match, "
+                f"representing "
+                f"{unbudgeted_ratio * 100:.2f}% of total "
+                f"budget. Mapping analysis found broader budget "
+                f"relationships for "
+                f"{broader_match_actual:,.2f} of these "
+                f"exceptions, requiring finance review, while "
+                f"{no_budget_identified_actual:,.2f} currently "
+                f"has no identified budget relationship. "
+                f"{over_budget_count} aggregated budget line "
+                f"code(s) are above budget and "
+                f"{no_budget_count} aggregated budget line "
+                f"code(s) contain exact-match exceptions."
+            )
+
+        else:
+
+            budget_reason = (
+                f"Budget utilization is "
+                f"{utilization_percentage:.2f}% and "
+                f"unbudgeted actual spending is "
+                f"{unbudgeted_actual:,.2f}, representing "
+                f"{unbudgeted_ratio * 100:.2f}% of total "
+                f"budget. {over_budget_count} aggregated "
+                f"budget line code(s) are above budget and "
+                f"{no_budget_count} aggregated budget line "
+                f"code(s) have actual activity with no "
+                f"budget amount identified in the current "
+                f"portfolio view."
+            )
 
     else:
 
