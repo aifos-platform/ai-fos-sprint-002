@@ -14,9 +14,9 @@ def build_kpi_dashboard(organization) -> dict[str, Any]:
     return {
         "financial_health_score": health.get("score"),
         "financial_health_rating": health.get("rating"),
-        "revenue": income.get("revenue"),
-        "expenses": income.get("expenses"),
-        "net_result": income.get("net_surplus_deficit", income.get("net_profit")),
+        "revenue": income.get("current_period_revenue"),
+        "expenses": income.get("current_period_expenses"),
+        "net_result": income.get("current_period_result"),
         "available_cash": liquidity.get("available_cash"),
         "cash_runway_months": liquidity.get("cash_runway_months"),
         "budget_utilization": budget.get("executive_summary", {}).get(
