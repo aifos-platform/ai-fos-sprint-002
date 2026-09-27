@@ -17,6 +17,9 @@ from app.services.budget import Budget
 from app.services.needed_budget import NeededBudget
 from app.services.budget_summary import generate_budget_summary
 from app.services.budget_vs_actual import generate_budget_vs_actual
+from app.services.budget_mapping_intelligence import (
+    generate_budget_mapping_intelligence,
+)
 from app.services.budget_dimension_drilldown import (
     generate_budget_dimension_drilldown,
 )
@@ -116,6 +119,7 @@ class Organization:
         self.budget = Budget()
         self.budget_summary = None
         self.budget_vs_actual = None
+        self.budget_mapping_intelligence = None
         self.budget_dashboard = None
 
         self.needed_budget = NeededBudget()
@@ -267,7 +271,7 @@ class Organization:
             ),
             "fiscal_years": fiscal_years,
             "review_count": review_count,
-        }  
+        }
 
 
     def load_expected_funding(
@@ -528,13 +532,21 @@ class Organization:
             accounts_by_number=self.accounts_by_number,
         )
 
+        self.budget_mapping_intelligence = (
+            generate_budget_mapping_intelligence(
+                budget_lines=self.budget.lines,
+                transactions=transactions_for_analysis,
+                accounts_by_number=self.accounts_by_number,
+            )
+        )
+
         self.budget_dimension_drilldown = (
             generate_budget_dimension_drilldown(
                 budget_lines=self.budget.lines,
                 transactions=transactions_for_analysis,
                 accounts_by_number=self.accounts_by_number,
             )
-        )        
+        )
 
         self.budget_dashboard = generate_budget_dashboard(
             budget_summary=self.budget_summary,
@@ -1037,7 +1049,7 @@ class Organization:
                 accounts_by_number=self.accounts_by_number,
                 validated_balance_sheet=self.balance_sheet,
             )
-        )        
+        )
 
         self.cash_flow = generate_cash_flow_statement(
             period_transactions,
@@ -1049,7 +1061,7 @@ class Organization:
             generate_standard_cash_flow_statement(
                 cash_flow=self.cash_flow,
             )
-        )        
+        )
 
         self.liquidity = calculate_liquidity(
             transactions=period_transactions,
@@ -1070,11 +1082,11 @@ class Organization:
         self.financial_trends = generate_financial_trends(
             transactions=period_transactions,
             accounts_by_number=self.accounts_by_number,
-        ) 
+        )
 
         self.financial_forecast = generate_financial_forecast(
             financial_trends=self.financial_trends,
-        )  
+        )
 
     def run_financial_scenario(
         self,
@@ -1126,7 +1138,7 @@ class Organization:
             )
         )
 
-        return self.financial_scenario  
+        return self.financial_scenario
 
     def compare_financial_scenarios(
         self,
@@ -1186,7 +1198,7 @@ class Organization:
             scenario_basis=scenario_basis,
         )
 
-        return self.funding_scenario                       
+        return self.funding_scenario
 
     def calculate_financial_health(
         self,
@@ -1253,7 +1265,7 @@ class Organization:
             liquidity=self.liquidity,
             funding_gap=self.funding_gap,
             grant_diagnostics=self.grant_diagnostics,
-        ) 
+        )
 
     def build_financial_opportunities(self) -> None:
         """
@@ -1273,7 +1285,7 @@ class Organization:
                 budget_dashboard=self.budget_dashboard,
                 grant_diagnostics=self.grant_diagnostics,
             )
-        )               
+        )
 
     def build_cfo_recommendations(self) -> None:
         """
@@ -1313,7 +1325,7 @@ class Organization:
                 cfo_recommendations=self.cfo_recommendations,
                 financial_opportunities=self.financial_opportunities,
             )
-        )        
+        )
 
     def build_structured_cfo_report(self) -> None:
         """
@@ -1337,7 +1349,7 @@ class Organization:
             financial_trends=self.financial_trends,
             financial_forecast=self.financial_forecast,
             core_cost_coverage=self.core_cost_coverage,
-        )        
+        )
 
     def build_kpi_dashboard(self) -> None:
         """

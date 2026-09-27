@@ -1221,7 +1221,7 @@ def run_financial_scenario(
         scenario_decision_intelligence=(
             organization.scenario_decision_intelligence
         ),
-    )    
+    )
 
     return {
         "status": financial_scenario.get(
@@ -1384,7 +1384,7 @@ def validate_ai_cfo_question_catalog() -> dict[str, Any]:
 @app.get("/reports/{organisation_id}/cfo/pdf")
 def download_cfo_report_pdf(
     organisation_id: str,
-):  
+):
     """
     Download the persisted AI-FOS CFO Financial
     Intelligence Report for an organization.
@@ -1599,7 +1599,7 @@ def get_standard_cash_flow_statement(
             "validated_financial_output_preserved": True,
             "persisted_reporting_output_used": True,
         },
-    } 
+    }
 
 @app.get(
     "/reports/{organisation_id}/income-statement"
@@ -1618,7 +1618,7 @@ def get_standard_income_statement(
 
     workspace = workspace_service.get_workspace_by_organisation(
         organisation_id=organisation_id
-    )   
+    )
 
     if workspace is None:
         raise HTTPException(
@@ -2153,7 +2153,7 @@ def download_standard_balance_sheet_excel(
                 f'attachment; filename="{filename}"'
             ),
         },
-    )    
+    )
 
 def get_standard_income_statement(
     organisation_id: str,
@@ -2720,7 +2720,7 @@ async def upload_file(
             financial_model_service.save_dim_account(
                 financial_model_folder=financial_model_folder,
                 accounts=gl_account_result["accounts"],
-            )            
+            )
 
             print(
                 "Minimal DIM_ACCOUNT generated "
@@ -2954,7 +2954,7 @@ async def upload_file(
                     print(
                         "CORE COST COVERAGE restored "
                         "from workspace."
-                    )                    
+                    )
 
         if organization.budget.lines:
             organization.generate_budget_analysis()
@@ -2973,7 +2973,7 @@ async def upload_file(
             income_statement=organization.income_statement,
             standard_income_statement=(
                 organization.standard_income_statement
-            ),            
+            ),
             balance_sheet=organization.balance_sheet,
             standard_balance_sheet=organization.standard_balance_sheet,
             cash_flow=organization.cash_flow,
@@ -3031,12 +3031,18 @@ async def upload_file(
             analysis_start_date=None,
             analysis_end_date=None,
             source="financial_processing",
-        )     
+        )
 
         financial_model_service.save_json(
             financial_model_folder=financial_model_folder,
             filename="budget_vs_actual.json",
             data=organization.budget_vs_actual,
+        )
+
+        financial_model_service.save_json(
+            financial_model_folder=financial_model_folder,
+            filename="budget_mapping_intelligence.json",
+            data=organization.budget_mapping_intelligence,
         )
 
         if organization.needed_budget_vs_actual:
@@ -3058,7 +3064,7 @@ async def upload_file(
                 financial_model_folder=financial_model_folder,
                 filename="expected_funding_intelligence.json",
                 data=organization.expected_funding_intelligence,
-            )            
+            )
 
         print("STEP 2")
         organization.calculate_financial_health()
@@ -3162,7 +3168,7 @@ async def upload_file(
 
         (financial_model_folder / "cfo_report.docx").write_bytes(
             cfo_report_word
-        )        
+        )
 
         organization.build_executive_dashboard()
 
@@ -3459,7 +3465,7 @@ async def upload_file(
                     filename="core_cost_coverage_intelligence.json",
                     data=organization.core_cost_coverage,
                 )
-            )                        
+            )
 
         return {
             "message": (f"{file.filename} uploaded " f"successfully as a Budget"),
@@ -3489,7 +3495,7 @@ async def upload_file(
                 str(expected_funding_intelligence_file)
                 if expected_funding_intelligence_file
                 else None
-            ), 
+            ),
             "core_cost_coverage_file": (
                 str(core_cost_coverage_file)
                 if core_cost_coverage_file
@@ -3502,7 +3508,7 @@ async def upload_file(
                 str(core_cost_coverage_intelligence_file)
                 if core_cost_coverage_intelligence_file
                 else None
-            ),                       
+            ),
             "sheet_count": sheet_count,
             "sheet_names": sheet_names,
             "sheet_name": sheet_name,
