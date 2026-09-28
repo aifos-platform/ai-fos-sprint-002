@@ -1,6 +1,32 @@
 import { useNavigate } from "react-router-dom";
 import AppShell from "../components/AppShell";
 
+function formatCompactCurrency(value, currency = "USD") {
+  if (value === null || value === undefined || value === "") {
+    return "--";
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "--";
+  }
+
+  const normalizedCurrency =
+    typeof currency === "string" &&
+    /^[A-Za-z]{3}$/.test(currency)
+      ? currency.toUpperCase()
+      : "USD";
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: normalizedCurrency,
+    notation: "compact",
+    compactDisplay: "short",
+    maximumFractionDigits: 2,
+  }).format(number);
+}
+
 function Dashboard({
   health,
   kpis,
@@ -120,14 +146,12 @@ function Dashboard({
               Revenue
             </p>
 
-            <h3>
-              {kpis?.revenue != null
-                ? `£${(
-                    kpis.revenue /
-                    1_000_000
-                  ).toFixed(2)}M`
-                : "--"}
-            </h3>
+<h3>
+  {formatCompactCurrency(
+    kpis?.revenue,
+    currentOrganization?.baseCurrency
+  )}
+</h3>
 
             <p className="card-note">
               Current reporting period
@@ -139,14 +163,12 @@ function Dashboard({
               Expenses
             </p>
 
-            <h3>
-              {kpis?.expenses != null
-                ? `£${(
-                    kpis.expenses /
-                    1_000_000
-                  ).toFixed(2)}M`
-                : "--"}
-            </h3>
+<h3>
+  {formatCompactCurrency(
+    kpis?.expenses,
+    currentOrganization?.baseCurrency
+  )}
+</h3>
 
             <p className="card-note">
               Current reporting period
@@ -158,19 +180,12 @@ function Dashboard({
               Net result
             </p>
 
-            <h3>
-              {kpis?.net_result != null
-                ? `${kpis.net_result < 0
-                    ? "-"
-                    : ""
-                  }£${(
-                    Math.abs(
-                      kpis.net_result
-                    ) /
-                    1_000_000
-                  ).toFixed(2)}M`
-                : "--"}
-            </h3>
+<h3>
+  {formatCompactCurrency(
+    kpis?.net_result,
+    currentOrganization?.baseCurrency
+  )}
+</h3>
 
             <p className="card-note negative">
               Operating deficit
@@ -271,7 +286,7 @@ function Dashboard({
 
           <article className="card dashboard-support-card">
             <p className="card-label">
-              Active grants
+              Grants
             </p>
 
             <h3>
