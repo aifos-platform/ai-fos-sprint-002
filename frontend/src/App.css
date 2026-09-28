@@ -352,6 +352,10 @@ body {
   color: #dc2626;
 }
 
+.positive {
+  color: #16a34a;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;

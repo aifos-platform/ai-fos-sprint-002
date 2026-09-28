@@ -187,9 +187,24 @@ function Dashboard({
   )}
 </h3>
 
-            <p className="card-note negative">
-              Operating deficit
-            </p>
+{kpis?.net_result !== null &&
+  kpis?.net_result !== undefined && (
+    <p
+      className={`card-note ${
+        Number(kpis.net_result) < 0
+          ? "negative"
+          : Number(kpis.net_result) > 0
+            ? "positive"
+            : ""
+      }`}
+    >
+      {Number(kpis.net_result) < 0
+        ? "Operating deficit"
+        : Number(kpis.net_result) > 0
+          ? "Operating surplus"
+          : "Break-even"}
+    </p>
+  )}
           </article>
 
           <article className="card wide-card">
