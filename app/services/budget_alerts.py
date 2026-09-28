@@ -50,9 +50,10 @@ def generate_budget_alerts(
                 "severity": "High",
                 "message": (
                     f"${unbudgeted_actual:,.2f} of portfolio actual spending "
-                    "has no matching approved budget."
+                    "does not have an exact approved budget-line match and "
+                    "requires budget mapping review."
                 ),
-            }
+                            }
         )
 
     elif no_budget > 0:
