@@ -279,9 +279,11 @@ function Dashboard({
             </h3>
 
             <p className="card-note">
-              Across{" "}
-              {kpis?.project_count ?? "--"}{" "}
-              projects
+              {kpis?.project_count > 0
+                ? `Across ${kpis.project_count} projects`
+                : kpis?.program_count > 0
+                  ? `Across ${kpis.program_count} programs`
+                  : "No project or program dimension available"}
             </p>
           </article>
 

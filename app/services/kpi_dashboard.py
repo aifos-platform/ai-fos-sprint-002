@@ -30,6 +30,7 @@ def build_kpi_dashboard(organization) -> dict[str, Any]:
             "no_budget_count"
         ),
         "grant_count": len(organization.grants),
+        "program_count": budget.get("organization", {}).get("program_count"),
         "project_count": budget.get("organization", {}).get("project_count"),
         "donor_count": budget.get("organization", {}).get("donor_count"),
     }

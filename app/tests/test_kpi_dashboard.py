@@ -14,7 +14,13 @@ def test_kpi_dashboard_uses_current_period_income_statement_values():
             "current_period_result": -1369342.70,
         },
         financial_health={},
-        budget_dashboard={},
+        budget_dashboard={
+            "organization": {
+                "program_count": 27,
+                "project_count": 0,
+                "donor_count": 11,
+            }
+        },
         liquidity={},
         grants={},
     )
@@ -24,3 +30,6 @@ def test_kpi_dashboard_uses_current_period_income_statement_values():
     assert dashboard["revenue"] == 10208.45
     assert dashboard["expenses"] == 1379551.15
     assert dashboard["net_result"] == -1369342.70
+    assert dashboard["program_count"] == 27
+    assert dashboard["project_count"] == 0
+    assert dashboard["donor_count"] == 11
