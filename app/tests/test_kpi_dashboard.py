@@ -22,7 +22,12 @@ def test_kpi_dashboard_uses_current_period_income_statement_values():
             }
         },
         liquidity={},
-        grants={},
+        grants={
+            "FR0004-0002": SimpleNamespace(donor_code="FR0004"),
+            "FR0004-0003": SimpleNamespace(donor_code="FR0004"),
+            "FR0009-0001": SimpleNamespace(donor_code="FR0009"),
+            "FR0016-0001": SimpleNamespace(donor_code="FR0016"),
+        },
     )
 
     dashboard = build_kpi_dashboard(organization)
@@ -32,4 +37,4 @@ def test_kpi_dashboard_uses_current_period_income_statement_values():
     assert dashboard["net_result"] == -1369342.70
     assert dashboard["program_count"] == 27
     assert dashboard["project_count"] == 0
-    assert dashboard["donor_count"] == 11
+    assert dashboard["donor_count"] == 3

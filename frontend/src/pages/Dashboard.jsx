@@ -51,9 +51,9 @@ function Dashboard({
           <article className="card wide-card">
             <div className="card-header">
               <div>
-                <p className="card-label">
-                  Organization readiness
-                </p>
+            <p className="card-label">
+              Grants
+            </p>
 
                 <h3>
                   Financial data not available yet

@@ -659,6 +659,9 @@ class Organization:
 
             grant.code = grant_code
 
+            if donor_code:
+                grant.donor_code = donor_code
+
             grant_name = str(
                 budget_line.get(
                     "fund_name"
@@ -799,6 +802,9 @@ class Organization:
 
                 grant = Grant()
                 grant.code = grant_code
+
+                if donor_code:
+                    grant.donor_code = donor_code
 
                 grant_name = str(transaction.get("fund_name") or "").strip()
 
